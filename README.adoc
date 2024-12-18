@@ -35,3 +35,9 @@ $ mvn clean install
 == Contribute
 
 This is an open source project, and you are more than welcome to contribute!
+
+== Sponsors
+
+The original code was developed and open sourced by [Timefold](https://timefold.ai) during a team hacketon.
+Timefold is an open source solver for the vehicle routing problem, employee shift scheduling, maintenance scheduling
+and other planning problems.
