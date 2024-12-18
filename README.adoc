@@ -112,7 +112,7 @@ It stands for _Java class and spreadsheet_:
 
 === Really?
 
-No, not really. We just wanted to use the phrase "_It's Classysheet!_" in presentations.
+No, not really. We just wanted to use the phrase "_It's really Classysheet!_" in presentations.
 
 We also considered naming it _Sheetify_, but the phrase "_Let's sheetify it!_" didn't quite work.
 
