@@ -1,6 +1,6 @@
-package org.classysheet.excel.impl;
+package org.classysheet.core.impl.provider.excel;
 
-import org.classysheet.core.impl.SpreadsheetConnector;
+import org.classysheet.core.impl.provider.SpreadsheetConnector;
 import org.classysheet.core.impl.data.SheetData;
 import org.classysheet.core.impl.data.WorkbookData;
 import org.classysheet.core.impl.meta.ColumnMeta;

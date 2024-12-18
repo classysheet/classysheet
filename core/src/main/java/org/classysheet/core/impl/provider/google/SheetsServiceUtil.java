@@ -1,4 +1,4 @@
-package org.classysheet.core.sheet.google;
+package org.classysheet.core.impl.provider.google;
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;

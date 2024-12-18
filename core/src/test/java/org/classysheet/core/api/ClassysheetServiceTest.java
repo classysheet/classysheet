@@ -1,9 +1,9 @@
 package org.classysheet.core.api;
 
+import org.classysheet.core.api.domain.TestSheet;
+import org.classysheet.core.api.domain.TestSheetAlt;
+import org.classysheet.core.api.domain.TestWorkbook;
 import org.classysheet.core.impl.data.WorkbookData;
-import org.classysheet.core.impl.meta.ColumnMeta;
-import org.classysheet.core.impl.meta.SheetMeta;
-import org.classysheet.core.impl.meta.WorkbookMeta;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;

@@ -1,6 +1,4 @@
-package org.classysheet.core.api;
-
-import org.classysheet.core.api.domain.Sheet;
+package org.classysheet.core.api.domain;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

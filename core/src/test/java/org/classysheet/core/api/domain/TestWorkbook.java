@@ -1,6 +1,4 @@
-package org.classysheet.core.api;
-
-import org.classysheet.core.api.domain.Workbook;
+package org.classysheet.core.api.domain;
 
 import java.util.List;
 

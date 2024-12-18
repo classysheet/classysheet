@@ -1,4 +1,4 @@
-package org.classysheet.core.sheet.google;
+package org.classysheet.core.impl.provider.google;
 
 import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
