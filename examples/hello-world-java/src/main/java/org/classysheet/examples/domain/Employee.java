@@ -1,4 +1,4 @@
-package org.classysheet.example.domain;
+package org.classysheet.examples.domain;
 
 import org.classysheet.core.api.domain.IdColumn;
 import org.classysheet.core.api.domain.Sheet;

@@ -1,10 +1,10 @@
-package org.classysheet.example;
+package org.classysheet.examples;
 
 import org.classysheet.core.api.ClassysheetService;
-import org.classysheet.example.data.ScheduleGenerator;
-import org.classysheet.example.domain.Schedule;
+import org.classysheet.examples.data.ScheduleGenerator;
+import org.classysheet.examples.domain.Schedule;
 
-public class ExcelExample {
+public class GoogleSheetsExample {
 
     public static void main(String[] args) {
         // Once, at build or bootstrap time:
@@ -12,7 +12,7 @@ public class ExcelExample {
 
         // At runtime, per workbook:
         Schedule schedule = ScheduleGenerator.generateDemoData();
-        classysheetService.writeWorkbookToExcel(schedule);
+        classysheetService.writeWorkbookToGoogle(schedule);
     }
 
 }

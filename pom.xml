@@ -25,10 +25,17 @@
 
     <modules>
         <module>core</module>
+        <module>examples</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
+            <!-- Classysheet -->
+            <dependency>
+                <groupId>org.classysheet</groupId>
+                <artifactId>classysheet-core</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <!-- Logging -->
             <dependency>
                 <groupId>org.slf4j</groupId>

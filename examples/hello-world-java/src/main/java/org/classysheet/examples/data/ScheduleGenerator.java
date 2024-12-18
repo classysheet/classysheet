@@ -1,8 +1,8 @@
-package org.classysheet.example.data;
+package org.classysheet.examples.data;
 
-import org.classysheet.example.domain.Employee;
-import org.classysheet.example.domain.Schedule;
-import org.classysheet.example.domain.Shift;
+import org.classysheet.examples.domain.Employee;
+import org.classysheet.examples.domain.Schedule;
+import org.classysheet.examples.domain.Shift;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

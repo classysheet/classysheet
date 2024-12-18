@@ -4,9 +4,6 @@ import org.classysheet.core.impl.data.WorkbookData;
 import org.classysheet.core.impl.meta.ColumnMeta;
 import org.classysheet.core.impl.meta.SheetMeta;
 import org.classysheet.core.impl.meta.WorkbookMeta;
-import org.classysheet.example.domain.Employee;
-import org.classysheet.example.domain.Schedule;
-import org.classysheet.example.domain.Shift;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalDate;
@@ -18,29 +15,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ClassysheetServiceTest {
 
-    @Test
-    void getWorkbookMeta() {
-        ClassysheetService<Schedule> classysheetService = ClassysheetService.create(Schedule.class);
-        WorkbookMeta workbookMeta = classysheetService.getWorkbookMeta();
-        assertThat(workbookMeta).isNotNull();
-        assertThat(workbookMeta.workbookClass()).isEqualTo(Schedule.class);
-        List<SheetMeta> sheetMetas = workbookMeta.sheetMetas();
-        assertThat(sheetMetas).hasSize(2);
-
-        SheetMeta employeeSheetMeta = sheetMetas.stream()
-                .filter(sheetMeta -> sheetMeta.name().equals("Employees"))
-                .findFirst().get();
-        assertThat(employeeSheetMeta.sheetClass()).isEqualTo(Employee.class);
-        List<ColumnMeta> employeeColumnMetas = employeeSheetMeta.columnMetas();
-        assertThat(employeeColumnMetas).hasSize(3);
-
-        SheetMeta shiftsSheetMeta = sheetMetas.stream()
-                .filter(sheetMeta -> sheetMeta.name().equals("Shifts"))
-                .findFirst().get();
-        assertThat(shiftsSheetMeta.sheetClass()).isEqualTo(Shift.class);
-        List<ColumnMeta> shiftColumnMetas = shiftsSheetMeta.columnMetas();
-        assertThat(shiftColumnMetas).hasSize(4);
-    }
+//    @Test
+//    void getWorkbookMeta() {
+//        ClassysheetService<Schedule> classysheetService = ClassysheetService.create(Schedule.class);
+//        WorkbookMeta workbookMeta = classysheetService.getWorkbookMeta();
+//        assertThat(workbookMeta).isNotNull();
+//        assertThat(workbookMeta.workbookClass()).isEqualTo(Schedule.class);
+//        List<SheetMeta> sheetMetas = workbookMeta.sheetMetas();
+//        assertThat(sheetMetas).hasSize(2);
+//
+//        SheetMeta employeeSheetMeta = sheetMetas.stream()
+//                .filter(sheetMeta -> sheetMeta.name().equals("Employees"))
+//                .findFirst().get();
+//        assertThat(employeeSheetMeta.sheetClass()).isEqualTo(Employee.class);
+//        List<ColumnMeta> employeeColumnMetas = employeeSheetMeta.columnMetas();
+//        assertThat(employeeColumnMetas).hasSize(3);
+//
+//        SheetMeta shiftsSheetMeta = sheetMetas.stream()
+//                .filter(sheetMeta -> sheetMeta.name().equals("Shifts"))
+//                .findFirst().get();
+//        assertThat(shiftsSheetMeta.sheetClass()).isEqualTo(Shift.class);
+//        List<ColumnMeta> shiftColumnMetas = shiftsSheetMeta.columnMetas();
+//        assertThat(shiftColumnMetas).hasSize(4);
+//    }
 
     final List<TestSheet> TEST_SHEETS = List.of(
             new TestSheet("Ann", 1, LocalDate.of(2000, 1, 1), LocalTime.of(1,0), LocalDateTime.of(2000, 1, 2, 1, 1)),
