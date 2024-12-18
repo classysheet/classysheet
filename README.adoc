@@ -32,12 +32,28 @@ $ cd classysheet
 $ mvn clean install
 ----
 
+== FAQ
+
+=== Why did you name it Classysheet?
+
+It stands for _Java class and spreadsheet_:
+
+- `class` is short for `Java class`
+- `y` is Spanish for `and`
+- `sheet` is short for `spreadsheet`
+
+=== Really?
+
+No, not really. We just wanted to use the phrase "_It's Classysheet!_" in presentations.
+
+We also considered naming it _Sheetify_, but the phrase "_Let's sheetify it!_" didn't quite work.
+
 == Contribute
 
 This is an open source project, and you are more than welcome to contribute!
 
 == Sponsors
 
-The original code was developed and open sourced by [Timefold](https://timefold.ai) during a team hacketon.
+The original code was developed and open sourced by https://timefold.ai[Timefold] during a team hacketon.
 Timefold is an open source solver for the vehicle routing problem, employee shift scheduling, maintenance scheduling
 and other planning problems.
