@@ -70,6 +70,8 @@ Schedule schedule = ...;
 classysheetService.writeWorkbookToExcel(schedule);
 ----
 
+*Note*: reading is not yet supported.
+
 == Get started
 
 Take a look at the examples:
