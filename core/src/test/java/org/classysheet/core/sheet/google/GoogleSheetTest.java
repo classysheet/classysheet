@@ -4,12 +4,14 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.UpdateValuesResponse;
 import com.google.api.services.sheets.v4.model.ValueRange;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Arrays;
 
+@Disabled() // TODO Enable test when it works on any machine (without sharing secrets)
 public class GoogleSheetTest {
     private static Sheets sheetsService;
     private static String SPREADSHEET_ID = "19sd5Bw51OsHruzZzkpygXkatBwjSkSxZPZpiW_hzoV8";

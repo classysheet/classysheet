@@ -32,7 +32,7 @@ class ClassysheetServiceTest {
                 .findFirst().get();
         assertThat(employeeSheetMeta.sheetClass()).isEqualTo(Employee.class);
         List<ColumnMeta> employeeColumnMetas = employeeSheetMeta.columnMetas();
-        assertThat(employeeColumnMetas).hasSize(2);
+        assertThat(employeeColumnMetas).hasSize(3);
 
         SheetMeta shiftsSheetMeta = sheetMetas.stream()
                 .filter(sheetMeta -> sheetMeta.name().equals("Shifts"))
