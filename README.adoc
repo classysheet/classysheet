@@ -6,9 +6,15 @@ image:https://img.shields.io/badge/stackoverflow-ask_question-orange.svg?logo=st
 image:https://img.shields.io/github/discussions/classysheet/classysheet?style=for-the-badge&logo=github["GitHub Discussions", link="https://github.com/classysheet/classysheet/discussions"]
 image:https://img.shields.io/github/issues/classysheet/classysheet?style=for-the-badge&logo=github["GitHub Issues", link="https://github.com/classysheet/classysheet/issues"]
 
-== Get started
+== What is Classysheet?
 
 TODO
+
+== Get started
+
+Take a look at the examples:
+
+- link:examples/hello-world-java/src/main/java/org/classysheet/examples/ExcelExample.java[Java to Excel hello-world]
 
 == Build from source
 
