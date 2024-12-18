@@ -1,14 +1,74 @@
 = Classysheet
 
-An *object to spreadsheet mapper* that converts Java (or Kotlin) class instances to (or from) a spreadsheet, such as Google Sheets or Excel.
-
 image:https://img.shields.io/badge/stackoverflow-ask_question-orange.svg?logo=stackoverflow&style=for-the-badge["Stackoverflow", link="https://stackoverflow.com/questions/tagged/classysheet"]
 image:https://img.shields.io/github/discussions/classysheet/classysheet?style=for-the-badge&logo=github["GitHub Discussions", link="https://github.com/classysheet/classysheet/discussions"]
 image:https://img.shields.io/github/issues/classysheet/classysheet?style=for-the-badge&logo=github["GitHub Issues", link="https://github.com/classysheet/classysheet/issues"]
 
 == What is Classysheet?
 
-TODO
+An *object to spreadsheet mapper* that converts Java (or Kotlin) objects
+to (or from) a spreadsheet, such as Google Sheets or Excel.
+It can be customized through class annotations.
+
+== How does it work?
+
+. Annotate your domain classes or records with an `@Sheet` annotation:
++
+----
+@Sheet
+public class Shift {
+    private String id;
+    private LocalDateTime start;
+    private LocalDateTime end;
+    private Employee employee;
+    ...
+}
+----
++
+If another sheet uses it, add an `@IdColumn` annotation on a field:
++
+----
+@Sheet
+public record Employee(
+    @IdColumn String name,
+    long age,
+    double cost) {}
+----
+
+. Export it to Excel:
++
+image::docs/excel-shifts-screenshot.png[Excel shifts screenshot]
++
+image::docs/excel-employees-screenshot.png[Excel shifts screenshot]
+
+. Or Google Sheets: TODO
+
+
+== How do I use it?
+
+. Create a class to wrap all data that goes into the workbook:
++
+----
+@Workbook
+public class Schedule {
+    private List<Employee> employees;
+    private List<Shift> shifts;
+    ...
+}
+----
+
+. Once, when bootstrapping your application, create the ClassysheetService singleton:
++
+----
+ClassysheetService<Schedule> classysheetService = ClassysheetService.create(Schedule.class);
+----
+
+. For every import/export of data from/to a spreadsheet, use read/write method on it:
++
+----
+Schedule schedule = ...;
+classysheetService.writeWorkbookToExcel(schedule);
+----
 
 == Get started
 
