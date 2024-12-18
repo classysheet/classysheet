@@ -1,0 +1,37 @@
+= Classysheet
+
+An *object to spreadsheet mapper* that converts Java (or Kotlin) class instances to (or from) a spreadsheet, such as Google Sheets or Excel.
+
+image:https://img.shields.io/badge/stackoverflow-ask_question-orange.svg?logo=stackoverflow&style=for-the-badge["Stackoverflow", link="https://stackoverflow.com/questions/tagged/classysheet"]
+image:https://img.shields.io/github/discussions/classysheet/classysheet?style=for-the-badge&logo=github["GitHub Discussions", link="https://github.com/classysheet/classysheet/discussions"]
+image:https://img.shields.io/github/issues/classysheet/classysheet?style=for-the-badge&logo=github["GitHub Issues", link="https://github.com/classysheet/classysheet/issues"]
+
+== Get started
+
+TODO
+
+== Build from source
+
+. Install JDK 17+ and Maven 3.9+, for example with https://sdkman.io[Sdkman]:
++
+----
+$ sdk install java
+$ sdk install maven
+----
+
+. Git clone this repository:
++
+----
+$ git clone https://github.com/classysheet/classysheet.git
+$ cd classysheet
+----
+
+. Build it from source:
++
+----
+$ mvn clean install
+----
+
+== Contribute
+
+This is an open source project, and you are more than welcome to contribute!
