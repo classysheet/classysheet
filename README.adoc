@@ -88,7 +88,7 @@ Take a look at the examples:
 The **Google Sheets example** requires you to provide a Google Sheets API key and grant the necessary permissions. Follow these steps to set it up:
 
 1. **Create a Project in Google Cloud Console**
-   - Go to the [Google Cloud Console](https://console.cloud.google.com/).
+   - Go to the link:https://console.cloud.google.com/[Google Cloud Console].
    - Click on the project dropdown and select **New Project**.
    - Enter a project name and click **Create**.
 
@@ -134,7 +134,7 @@ The **Google Sheets example** requires you to provide a Google Sheets API key an
    - When you run the example, you'll be prompted to authorize access to your Google account.
    - Follow the on-screen instructions to grant the required permissions.
 
-For more detailed instructions, refer to the [Google Sheets API Documentation](https://developers.google.com/sheets/api/quickstart/java).
+For more detailed instructions, refer to the  link:https://developers.google.com/sheets/api/quickstart/java[Google Sheets API Documentation].
 
 
 == Build from source
