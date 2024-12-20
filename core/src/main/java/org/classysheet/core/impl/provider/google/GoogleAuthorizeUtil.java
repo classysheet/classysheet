@@ -6,29 +6,48 @@ import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
 import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
 import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
+import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.store.MemoryDataStoreFactory;
 import com.google.api.services.sheets.v4.SheetsScopes;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.security.GeneralSecurityException;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class GoogleAuthorizeUtil {
+
+    // TODO: A secure way to give CLIENT_ID and CLIENT_SECRET
+    private static final String CLIENT_ID = "";
+    private static final String CLIENT_SECRET = "";
+
+    private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
+
+    private static Credential cachedCredential = null;
+
     public static Credential authorize() throws IOException, GeneralSecurityException {
+        if (cachedCredential != null) {
+            return cachedCredential;
+        }
 
-        InputStream in = GoogleAuthorizeUtil.class.getResourceAsStream("/client_secret_437587329982-2pcfslpg1pb6o1bvoudrd52hhpi5il6b.apps.googleusercontent.com.json");
-        GoogleClientSecrets clientSecrets = GoogleClientSecrets.load(GsonFactory.getDefaultInstance(), new InputStreamReader(in));
+        GoogleClientSecrets.Details web = new GoogleClientSecrets.Details();
+        web.setClientId(CLIENT_ID);
+        web.setClientSecret(CLIENT_SECRET);
+        GoogleClientSecrets clientSecrets = new GoogleClientSecrets().setWeb(web);
 
-        List<String> scopes = Arrays.asList(SheetsScopes.SPREADSHEETS);
+        List<String> scopes = Collections.singletonList(SheetsScopes.SPREADSHEETS);
 
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(GoogleNetHttpTransport.newTrustedTransport(), GsonFactory.getDefaultInstance(), clientSecrets, scopes).setDataStoreFactory(new MemoryDataStoreFactory())
-                .setAccessType("offline").build();
-        Credential credential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
+                GoogleNetHttpTransport.newTrustedTransport(),
+                JSON_FACTORY,
+                clientSecrets,
+                scopes
+        ).setDataStoreFactory(new MemoryDataStoreFactory())
+                .setAccessType("offline")
+                .build();
 
-        return credential;
+        cachedCredential = new AuthorizationCodeInstalledApp(flow, new LocalServerReceiver()).authorize("user");
+        return cachedCredential;
     }
 }

@@ -9,19 +9,44 @@
     </parent>
 
     <artifactId>classysheet-hello-world-java</artifactId>
+    <repositories>
+        <repository>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+    </repositories>
 
     <dependencies>
         <!-- Classysheet -->
         <dependency>
-            <groupId>org.classysheet</groupId>
-            <artifactId>classysheet-core</artifactId>
-        </dependency>
+        <groupId>org.classysheet</groupId>
+        <artifactId>classysheet-core</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </dependency>
         <!-- Logging -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <scope>runtime</scope>
         </dependency>
+        <!-- Google sheets authentication service -->
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>2.4.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.oauth-client</groupId>
+            <artifactId>google-oauth-client-jetty</artifactId>
+            <version>1.34.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-sheets</artifactId>
+            <version>v4-rev20241203-2.0.0</version>
+        </dependency>
+
+
         <!-- Testing -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -34,4 +59,6 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+
 </project>
