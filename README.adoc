@@ -57,17 +57,17 @@ public class Schedule {
 }
 ----
 
-. Once, when bootstrapping your application, create the ClassysheetService singleton:
+. Once, when bootstrapping your application, create the `ClassysheetService` singleton:
 +
 ----
 ClassysheetService<Schedule> classysheetService = ClassysheetService.create(Schedule.class);
 ----
 
-. For every import/export of data from/to a spreadsheet, use read/write method on it:
+. To import/export data from/to a spreadsheet, use a read/write method on the `ClassysheetService`:
 +
 ----
 Schedule schedule = ...;
-classysheetService.writeWorkbookToExcel(schedule);
+classysheetService.writeExcelTmpFileAndShow(schedule);
 ----
 
 *Note*: reading is not yet supported.
@@ -102,9 +102,13 @@ $ mvn clean install
 
 == FAQ
 
+=== Is it free to use for commercial use?
+
+Yes, it's Apache Software License 2.0.
+
 === Why did you name it Classysheet?
 
-It stands for _Java class and spreadsheet_:
+_Classysheet_ stands for _Java class and spreadsheet_:
 
 - `class` is short for `Java class`
 - `y` is Spanish for `and`
@@ -112,7 +116,7 @@ It stands for _Java class and spreadsheet_:
 
 === Really?
 
-No, not really. We just wanted to use the phrase "_It's really Classysheet!_" in presentations.
+No, not really. We just wanted to use the phrase "_It's really Classysheet!_" in a presentation.
 
 We also considered naming it _Sheetify_, but the phrase "_Let's sheetify it!_" didn't quite work.
 
