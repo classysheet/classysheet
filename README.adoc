@@ -76,7 +76,8 @@ classysheetService.writeExcelTmpFileAndShow(schedule);
 
 Take a look at the examples:
 
-- link:examples/hello-world-java/src/main/java/org/classysheet/examples/ExcelExample.java[Java to Excel hello-world]
+- link:examples/hello-world-java/src/main/java/org/classysheet/examples/ExcelExample.java[Hello world Java (Excel)]
+- link:examples/quarkus-java/src/main/java/org/classysheet/examples/quarkus/rest/ClassysheetResource.java[Quarkus Java (Excel)]
 
 == Build from source
 
@@ -99,6 +100,24 @@ $ cd classysheet
 ----
 $ mvn clean install
 ----
+
+== Run an example
+
+* Run the Hello world example:
++
+----
+$ cd examples/hello-world-java
+// Run ExcelExample or GoogleSheetExample
+----
+
+* Run the Quarkus example:
++
+----
+$ cd examples/quarkus-java
+$ mvn clean quarkus:dev
+----
++
+Open http://localhost:8080
 
 == FAQ
 
