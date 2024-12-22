@@ -13,5 +13,8 @@
 
     <modules>
         <module>hello-world-java</module>
+        <module>quarkus-java</module>
+        <!-- TODO add spring-java -->
+        <!-- TODO add hello-world-kotlin -->
     </modules>
 </project>
