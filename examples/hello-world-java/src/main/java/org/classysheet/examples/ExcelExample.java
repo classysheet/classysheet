@@ -12,7 +12,7 @@ public class ExcelExample {
 
         // At runtime, per workbook:
         Schedule schedule = ScheduleGenerator.generateDemoData();
-        classysheetService.writeWorkbookToExcel(schedule);
+        classysheetService.writeExcelTmpFileAndShow(schedule);
     }
 
 }

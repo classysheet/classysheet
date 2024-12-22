@@ -1,6 +1,5 @@
 package org.classysheet.core.impl.provider.excel;
 
-import org.classysheet.core.impl.provider.SpreadsheetConnector;
 import org.classysheet.core.impl.data.SheetData;
 import org.classysheet.core.impl.data.WorkbookData;
 import org.classysheet.core.impl.meta.ColumnMeta;
@@ -15,10 +14,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class ExcelSpreadsheetConnector implements SpreadsheetConnector {
+public class ExcelSpreadsheetConnector {
 
-    @Override
-    public void writeWorkbook(WorkbookData workbookData) {
+    public File writeTmpFileAndShow(WorkbookData workbookData) {
         File file;
         try (Workbook workbook = new XSSFWorkbook()) {
             CreationHelper creationHelper = workbook.getCreationHelper();
@@ -96,17 +94,19 @@ public class ExcelSpreadsheetConnector implements SpreadsheetConnector {
                 sheet.createFreezePane(0, 1);
             }
 
-            file = File.createTempFile("classysheet", ".xlsx");
+            file = File.createTempFile(workbookData.workbookMeta().name(), ".xlsx");
             workbook.write(new FileOutputStream(file));
         } catch (IOException e) {
-            throw new RuntimeException("Failed to write Excel workbook file.", e);
+            throw new RuntimeException("Failed to write Excel file for workbook name (" +
+                    workbookData.workbookMeta().name() + ").", e);
         }
 
         try {
             Desktop.getDesktop().open(file);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to open the file (" + file + ").", e);
+            throw new RuntimeException("Failed to open the Excel file (" + file + ").", e);
         }
+        return file;
     }
 
 }

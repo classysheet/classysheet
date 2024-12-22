@@ -1,28 +1,12 @@
 package org.classysheet.core.api;
 
 import org.classysheet.core.api.domain.Workbook;
-import org.classysheet.core.impl.data.SheetData;
 import org.classysheet.core.impl.data.WorkbookData;
-import org.classysheet.core.impl.meta.SheetMeta;
 import org.classysheet.core.impl.meta.WorkbookMeta;
-import org.classysheet.core.impl.provider.google.SheetsServiceUtil;
 import org.classysheet.core.impl.provider.excel.ExcelSpreadsheetConnector;
 import org.classysheet.core.impl.provider.google.GoogleSpreadsheetConnector;
-import com.google.api.services.sheets.v4.Sheets;
-import com.google.api.services.sheets.v4.Sheets.Spreadsheets.Values;
-import com.google.api.services.sheets.v4.model.AddSheetRequest;
-import com.google.api.services.sheets.v4.model.BatchUpdateSpreadsheetRequest;
-import com.google.api.services.sheets.v4.model.BatchUpdateValuesRequest;
-import com.google.api.services.sheets.v4.model.Request;
-import com.google.api.services.sheets.v4.model.Sheet;
-import com.google.api.services.sheets.v4.model.SheetProperties;
-import com.google.api.services.sheets.v4.model.Spreadsheet;
-import com.google.api.services.sheets.v4.model.ValueRange;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.File;
 
 public class ClassysheetService<Workbook_> {
 
@@ -60,9 +44,9 @@ public class ClassysheetService<Workbook_> {
         googleSpreadsheetConnector.writeWorkbook(workbookData);
     }
 
-    public void writeWorkbookToExcel(Workbook_ workbook) {
+    public File writeExcelTmpFileAndShow(Workbook_ workbook) {
         WorkbookData workbookData = extractWorkbookData(workbook);
-        excelConnector.writeWorkbook(workbookData);
+        return excelConnector.writeTmpFileAndShow(workbookData);
     }
 
 }

@@ -85,6 +85,10 @@ public class WorkbookMeta {
         return namingStrategy;
     }
 
+    public String name() {
+        return name;
+    }
+
     public List<SheetMeta> sheetMetas() {
         return sheetMetas;
     }

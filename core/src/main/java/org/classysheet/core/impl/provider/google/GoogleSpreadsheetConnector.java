@@ -4,7 +4,6 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.*;
 import org.classysheet.core.impl.data.SheetData;
 import org.classysheet.core.impl.meta.SheetMeta;
-import org.classysheet.core.impl.provider.SpreadsheetConnector;
 import org.classysheet.core.impl.data.WorkbookData;
 
 import java.io.IOException;
@@ -12,9 +11,8 @@ import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class GoogleSpreadsheetConnector implements SpreadsheetConnector {
+public class GoogleSpreadsheetConnector {
 
-    @Override
     public void writeWorkbook(WorkbookData workbookData) {
 
         Sheets sheetService = null;
