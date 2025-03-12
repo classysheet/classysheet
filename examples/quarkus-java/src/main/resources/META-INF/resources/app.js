@@ -3,18 +3,21 @@ $(document).ready(function () {
   $("#writeExcelButton").click(function () {
     writeExcel();
   });
+  $("#readExcelButton").click(function () {
+    readExcel();
+  });
 
   setupAjax();
   fetchDemoData();
 });
 
 function setupAjax() {
-  $.ajaxSetup({
-    headers: {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json,text/plain',
-    }
-  });
+  // $.ajaxSetup({
+  //   headers: {
+  //     'Content-Type': 'application/json,multipart/form-data',
+  //     'Accept': 'application/json,text/plain',
+  //   }
+  // });
 
   // Extend jQuery to support $.put() and $.delete()
   jQuery.each(["put", "delete"], function (i, method) {
@@ -48,12 +51,40 @@ function fetchDemoData() {
 
 function writeExcel() {
   $.post("/classysheet/write-excel", function (data) {
-    scheduleId = data;
-    refreshSolvingButtons(true);
+    fetchDemoData();
   }).fail(function (xhr, ajaxOptions, thrownError) {
       showError("Write Excel failed.", xhr);
     },
     "text");
+}
+
+function readExcel() {
+  var file = $("#readExcelFile")[0].files[0];
+  if (!file) {
+    alert("Please select a file.");
+    return;
+  }
+  var formData = new FormData();
+  formData.append("file", file);
+  $.ajax({
+    url: "/classysheet/read-excel",
+    type: "POST",
+    data: formData,
+    processData: false,
+    contentType: false,
+    success: function (response) {
+      fetchDemoData();
+    },
+    error: function (xhr, status, error) {
+      showError("Read Excel failed.", xhr);
+    }
+  });
+  // $.post("/classysheet/read-excel", function (data) {
+  //   fetchDemoData();
+  // }).fail(function (xhr, ajaxOptions, thrownError) {
+  //     showError("Read Excel failed.", xhr);
+  //   },
+  //   "text");
 }
 
 

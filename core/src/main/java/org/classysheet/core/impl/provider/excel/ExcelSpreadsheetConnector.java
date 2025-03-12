@@ -15,6 +15,7 @@ import java.awt.Desktop;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -22,98 +23,110 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ExcelSpreadsheetConnector {
 
+    public WorkbookData readInputStream(WorkbookMeta workbookMeta, InputStream inputStream) {
+        try (Workbook workbook = new XSSFWorkbook(inputStream)) {
+            return readWorkbook(workbookMeta, workbook);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read Excel file from input stream.", e);
+        }
+    }
+
     public WorkbookData readFile(WorkbookMeta workbookMeta, File file) {
         try (Workbook workbook = new XSSFWorkbook(file)) {
-            List<SheetData> sheetDatas = new ArrayList<>(workbookMeta.sheetMetas().size());
-            for (SheetMeta sheetMeta : workbookMeta.sheetMetas()) {
-                Sheet sheet = workbook.getSheet(sheetMeta.name());
-                if (sheet == null) {
-                    throw new IllegalArgumentException("The Excel workbook does not contain a sheet with the name ("
-                            + sheetMeta.name() + ").");
-                }
-                List<Object> rows = new ArrayList<>(sheet.getLastRowNum());
-                Row headerRow = sheet.getRow(0);
-                for (ColumnMeta columnMeta : sheetMeta.columnMetas()) {
-                    Cell headerCell = headerRow.getCell(columnMeta.index());
-                    if (headerCell == null) {
-                        throw newIllegalFormatException(sheet, columnMeta.index(), 0,
-                                "The column (" + columnMeta.name() + ") is missing.");
-                    }
-                    String name = headerCell.getStringCellValue();
-                    if (!Objects.equals(name, columnMeta.name())) {
-                        throw newIllegalFormatException(headerCell, "The actual column name (" + name + ")"
-                                + ") is not the expected column name (" + columnMeta.name() + ").");
-                    }
-                }
-                int columnCount = headerRow.getLastCellNum();
-                if (columnCount != sheetMeta.columnMetas().size()) {
-                    throw newIllegalFormatException(sheet, sheetMeta.columnMetas().size(), 0,
-                            "The actual column count (" + columnCount
-                            + ") is more than the expected column count (" + sheetMeta.columnMetas().size() + ").");
-                }
-                boolean firstRow = true;
-                for (Row row : sheet) {
-                    if (firstRow) {
-                        firstRow = false;
-                        continue;
-                    }
-                    List<Object> values = new ArrayList<>(sheetMeta.columnMetas().size());
-                    for (ColumnMeta columnMeta : sheetMeta.columnMetas()) {
-                        Cell cell = row.getCell(columnMeta.index());
-                        Object value;
-                        if (cell == null || cell.getCellType() == CellType.BLANK) {
-                            value = null;
-                        } else if (columnMeta.isTypeString()) {
-                            if (cell.getCellType() != CellType.STRING) {
-                                throw newIllegalFormatException(cell, "The actual cell type (" + cell.getCellType() + ")"
-                                        + ") is not the expected cell type (" + CellType.STRING + ").");
-                            }
-                            value = cell.getStringCellValue();
-                        } else if (columnMeta.isTypeLong()) {
-                            if (cell.getCellType() != CellType.NUMERIC) {
-                                throw newIllegalFormatException(cell, "The actual cell type (" + cell.getCellType() + ")"
-                                        + ") is not the expected cell type (" + CellType.NUMERIC + ").");
-                            }
-                            value = (long) cell.getNumericCellValue();
-                        } else if (columnMeta.isTypeDouble()) {
-                            if (cell.getCellType() != CellType.NUMERIC) {
-                                throw newIllegalFormatException(cell, "The actual cell type (" + cell.getCellType() + ")"
-                                        + ") is not the expected cell type (" + CellType.NUMERIC + ").");
-                            }
-                            value = cell.getNumericCellValue();
-                        } else if (columnMeta.isTypeLocalDate()) {
-                            if (cell.getCellType() != CellType.NUMERIC) {
-                                throw newIllegalFormatException(cell, "The actual cell type (" + cell.getCellType() + ")"
-                                        + ") is not the expected cell type (" + CellType.NUMERIC + ").");
-                            }
-                            value = cell.getLocalDateTimeCellValue().toLocalDate();
-                        } else if (columnMeta.isTypeLocalDateTime()) {
-                            if (cell.getCellType() != CellType.NUMERIC) {
-                                throw newIllegalFormatException(cell, "The actual cell type (" + cell.getCellType() + ")"
-                                        + ") is not the expected cell type (" + CellType.NUMERIC + ").");
-                            }
-                            value = cell.getLocalDateTimeCellValue();
-                        } else if (columnMeta.isReference()) {
-                            if (cell.getCellType() != CellType.STRING) {
-                                throw newIllegalFormatException(cell, "The actual cell type (" + cell.getCellType() + ")"
-                                        + ") is not the expected cell type (" + CellType.STRING + ").");
-                            }
-                            value = cell.getStringCellValue();
-                            value = null; // TODO FIXME
-                        } else {
-                            throw newIllegalFormatException(cell, "Unsupported type.");
-                        }
-                        values.add(value);
-                    }
-                    rows.add(sheetMeta.createRowObject(values));
-                }
-                SheetData sheetData = SheetData.ofRowDatas(sheetMeta, rows);
-                sheetDatas.add(sheetData);
-            }
-            return new WorkbookData(workbookMeta, sheetDatas);
+            return readWorkbook(workbookMeta, workbook);
         } catch (IOException | InvalidFormatException e) {
             throw new RuntimeException("Failed to read Excel file from file (" + file + ").", e);
         }
+    }
+
+    public WorkbookData readWorkbook(WorkbookMeta workbookMeta, Workbook workbook) {
+        List<SheetData> sheetDatas = new ArrayList<>(workbookMeta.sheetMetas().size());
+        for (SheetMeta sheetMeta : workbookMeta.sheetMetas()) {
+            Sheet sheet = workbook.getSheet(sheetMeta.name());
+            if (sheet == null) {
+                throw new IllegalArgumentException("The Excel workbook does not contain a sheet with the name ("
+                        + sheetMeta.name() + ").");
+            }
+            List<Object> rows = new ArrayList<>(sheet.getLastRowNum());
+            Row headerRow = sheet.getRow(0);
+            for (ColumnMeta columnMeta : sheetMeta.columnMetas()) {
+                Cell headerCell = headerRow.getCell(columnMeta.index());
+                if (headerCell == null) {
+                    throw newIllegalFormatException(sheet, columnMeta.index(), 0,
+                            "The column (" + columnMeta.name() + ") is missing.");
+                }
+                String name = headerCell.getStringCellValue();
+                if (!Objects.equals(name, columnMeta.name())) {
+                    throw newIllegalFormatException(headerCell, "The actual column name (" + name + ")"
+                            + ") is not the expected column name (" + columnMeta.name() + ").");
+                }
+            }
+            int columnCount = headerRow.getLastCellNum();
+            if (columnCount != sheetMeta.columnMetas().size()) {
+                throw newIllegalFormatException(sheet, sheetMeta.columnMetas().size(), 0,
+                        "The actual column count (" + columnCount
+                        + ") is more than the expected column count (" + sheetMeta.columnMetas().size() + ").");
+            }
+            boolean firstRow = true;
+            for (Row row : sheet) {
+                if (firstRow) {
+                    firstRow = false;
+                    continue;
+                }
+                List<Object> values = new ArrayList<>(sheetMeta.columnMetas().size());
+                for (ColumnMeta columnMeta : sheetMeta.columnMetas()) {
+                    Cell cell = row.getCell(columnMeta.index());
+                    Object value;
+                    if (cell == null || cell.getCellType() == CellType.BLANK) {
+                        value = null;
+                    } else if (columnMeta.isTypeString()) {
+                        if (cell.getCellType() != CellType.STRING) {
+                            throw newIllegalFormatException(cell, "The actual cell type (" + cell.getCellType() + ")"
+                                    + ") is not the expected cell type (" + CellType.STRING + ").");
+                        }
+                        value = cell.getStringCellValue();
+                    } else if (columnMeta.isTypeLong()) {
+                        if (cell.getCellType() != CellType.NUMERIC) {
+                            throw newIllegalFormatException(cell, "The actual cell type (" + cell.getCellType() + ")"
+                                    + ") is not the expected cell type (" + CellType.NUMERIC + ").");
+                        }
+                        value = (long) cell.getNumericCellValue();
+                    } else if (columnMeta.isTypeDouble()) {
+                        if (cell.getCellType() != CellType.NUMERIC) {
+                            throw newIllegalFormatException(cell, "The actual cell type (" + cell.getCellType() + ")"
+                                    + ") is not the expected cell type (" + CellType.NUMERIC + ").");
+                        }
+                        value = cell.getNumericCellValue();
+                    } else if (columnMeta.isTypeLocalDate()) {
+                        if (cell.getCellType() != CellType.NUMERIC) {
+                            throw newIllegalFormatException(cell, "The actual cell type (" + cell.getCellType() + ")"
+                                    + ") is not the expected cell type (" + CellType.NUMERIC + ").");
+                        }
+                        value = cell.getLocalDateTimeCellValue().toLocalDate();
+                    } else if (columnMeta.isTypeLocalDateTime()) {
+                        if (cell.getCellType() != CellType.NUMERIC) {
+                            throw newIllegalFormatException(cell, "The actual cell type (" + cell.getCellType() + ")"
+                                    + ") is not the expected cell type (" + CellType.NUMERIC + ").");
+                        }
+                        value = cell.getLocalDateTimeCellValue();
+                    } else if (columnMeta.isReference()) {
+                        if (cell.getCellType() != CellType.STRING) {
+                            throw newIllegalFormatException(cell, "The actual cell type (" + cell.getCellType() + ")"
+                                    + ") is not the expected cell type (" + CellType.STRING + ").");
+                        }
+                        value = cell.getStringCellValue();
+                        value = null; // TODO FIXME
+                    } else {
+                        throw newIllegalFormatException(cell, "Unsupported type.");
+                    }
+                    values.add(value);
+                }
+                rows.add(sheetMeta.createRowObject(values));
+            }
+            SheetData sheetData = SheetData.ofRowDatas(sheetMeta, rows);
+            sheetDatas.add(sheetData);
+        }
+        return new WorkbookData(workbookMeta, sheetDatas);
     }
 
     protected IllegalArgumentException newIllegalFormatException(Cell cell, String message) {

@@ -7,6 +7,7 @@ import org.classysheet.core.impl.provider.excel.ExcelSpreadsheetConnector;
 import org.classysheet.core.impl.provider.google.GoogleSpreadsheetConnector;
 
 import java.io.File;
+import java.io.InputStream;
 
 public class ClassysheetService<Workbook_> {
 
@@ -47,6 +48,12 @@ public class ClassysheetService<Workbook_> {
     @SuppressWarnings("unchecked")
     public Workbook_ readExcelFile(File file) {
         WorkbookData workbookData = excelConnector.readFile(workbookMeta, file);
+        return (Workbook_) workbookData.workbook();
+    }
+
+    @SuppressWarnings("unchecked")
+    public Workbook_ readExcelInputStream(InputStream inputStream) {
+        WorkbookData workbookData = excelConnector.readInputStream(workbookMeta, inputStream);
         return (Workbook_) workbookData.workbook();
     }
 
