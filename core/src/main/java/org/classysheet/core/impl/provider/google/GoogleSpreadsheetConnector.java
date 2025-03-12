@@ -14,8 +14,7 @@ import java.util.List;
 public class GoogleSpreadsheetConnector {
 
     public void writeWorkbook(WorkbookData workbookData) {
-
-        Sheets sheetService = null;
+        Sheets sheetService;
         try {
             sheetService = SheetsServiceUtil.getSheetsService();
         } catch (IOException | GeneralSecurityException e) {
@@ -56,11 +55,11 @@ public class GoogleSpreadsheetConnector {
                         ));
                 data.add(columnNames);
 
-                sheetData.streamRows().forEach((row) -> {
+                sheetData.streamRowDatas().forEach((rowData) -> {
                     data.add(new ValueRange()
-                            .setRange(currentSheetName + "!A" + (row.index() + 2))
-                            .setValues(List.of(row.readValuesAsString())));
-                    System.out.println("Row: " + row);
+                            .setRange(currentSheetName + "!A" + (rowData.index() + 2))
+                            .setValues(List.of(rowData.readValuesAsString())));
+                    System.out.println("Row: " + rowData);
                 });
                 BatchUpdateValuesRequest valuesBody = new BatchUpdateValuesRequest()
                         .setValueInputOption("RAW")

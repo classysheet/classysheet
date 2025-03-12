@@ -19,6 +19,12 @@ public class Shift {
         this.employee = employee;
     }
 
+    @Override
+    public String toString() {
+        return "Shift[id=" + id + ", start=" + start +", end=" + end
+                + ", employee=" + (employee == null ? "null" : employee.name()) + "]";
+    }
+
     // ************************************************************************
     // Getters and setters
     // ************************************************************************

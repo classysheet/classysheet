@@ -10,21 +10,27 @@ import java.util.List;
 public class WorkbookData {
 
     private final WorkbookMeta workbookMeta;
-    private final Object workbook;
+    private final Object workbookObject;
     private List<SheetData> sheetDatas;
 
-    public WorkbookData(WorkbookMeta workbookMeta, Object workbook) {
+    public WorkbookData(WorkbookMeta workbookMeta, List<SheetData> sheetDatas) {
         this.workbookMeta = workbookMeta;
-        this.workbook = workbook;
-        if (workbook == null || !workbookMeta.workbookClass().isAssignableFrom(workbook.getClass())) {
+        workbookObject = workbookMeta.createWorkbookObject(sheetDatas);
+        this.sheetDatas = sheetDatas;
+    }
+
+    public WorkbookData(WorkbookMeta workbookMeta, Object workbookObject) {
+        this.workbookMeta = workbookMeta;
+        this.workbookObject = workbookObject;
+        if (workbookObject == null || !workbookMeta.workbookClass().isAssignableFrom(workbookObject.getClass())) {
             throw new IllegalArgumentException("The workbook class "
-                    + (workbook == null ? "null" : workbook.getClass()) + " is not an instance of "
+                    + (workbookObject == null ? "null" : workbookObject.getClass()) + " is not an instance of "
                     + workbookMeta.workbookClass() + ".");
         }
         List<SheetMeta> sheetMetas = workbookMeta.sheetMetas();
         sheetDatas = new ArrayList<>(sheetMetas.size());
         for (SheetMeta sheetMeta : sheetMetas) {
-            List<?> rows = sheetMeta.extractRows(workbook);
+            List<?> rows = sheetMeta.extractRows(workbookObject);
             sheetDatas.add(new SheetData(sheetMeta, rows));
         }
     }
@@ -40,6 +46,10 @@ public class WorkbookData {
 
     public WorkbookMeta workbookMeta() {
         return workbookMeta;
+    }
+
+    public Object workbook() {
+        return workbookObject;
     }
 
     public List<SheetData> sheetDatas() {

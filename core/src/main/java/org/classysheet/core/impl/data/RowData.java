@@ -12,13 +12,13 @@ public class RowData {
 
     private final SheetMeta sheetMeta;
     private final int index;
-    private final Object row;
+    private final Object rowObject;
 
-    public RowData(SheetMeta sheetMeta, int index, Object row) {
+    public RowData(SheetMeta sheetMeta, int index, Object rowObject) {
         this.sheetMeta = sheetMeta;
         this.index = index;
-        this.row = row;
-        if (row == null) {
+        this.rowObject = rowObject;
+        if (rowObject == null) {
             // TODO better error message that says which class etc
             throw new IllegalArgumentException("The row cannot be null.");
         }
@@ -45,10 +45,10 @@ public class RowData {
     public long readLong(ColumnMeta columnMeta) {
         if (columnMeta.field().getType().isPrimitive()) {
             try {
-                return columnMeta.field().getLong(row);
+                return columnMeta.field().getLong(rowObject);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException("Cannot read field (" + columnMeta.field()
-                        + ") for row object (" + row + ").", e);
+                        + ") for row object (" + rowObject + ").", e);
             }
         } else {
             return ((Number) readObject(columnMeta)).longValue();
@@ -58,10 +58,10 @@ public class RowData {
     public double readDouble(ColumnMeta columnMeta) {
         if (columnMeta.field().getType().isPrimitive()) {
             try {
-                return columnMeta.field().getDouble(row);
+                return columnMeta.field().getDouble(rowObject);
             } catch (IllegalAccessException e) {
                 throw new RuntimeException("Cannot read field (" + columnMeta.field()
-                        + ") for row object (" + row + ").", e);
+                        + ") for row object (" + rowObject + ").", e);
             }
         } else {
             return ((Number) readObject(columnMeta)).doubleValue();
@@ -92,10 +92,10 @@ public class RowData {
 
     protected Object readObject(ColumnMeta columnMeta) {
         try {
-            return columnMeta.field().get(row);
+            return columnMeta.field().get(rowObject);
         } catch (IllegalAccessException e) {
             throw new RuntimeException("Cannot read field (" + columnMeta.field()
-                    + ") for row object (" + row + ").", e);
+                    + ") for row object (" + rowObject + ").", e);
         }
     }
 
@@ -116,8 +116,8 @@ public class RowData {
         return index;
     }
 
-    protected Object row() {
-        return row;
+    public Object rowObject() {
+        return rowObject;
     }
 
 }

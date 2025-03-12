@@ -44,6 +44,12 @@ public class ClassysheetService<Workbook_> {
         googleSpreadsheetConnector.writeWorkbook(workbookData);
     }
 
+    @SuppressWarnings("unchecked")
+    public Workbook_ readExcelFile(File file) {
+        WorkbookData workbookData = excelConnector.readFile(workbookMeta, file);
+        return (Workbook_) workbookData.workbook();
+    }
+
     public File writeExcelTmpFileAndShow(Workbook_ workbook) {
         WorkbookData workbookData = extractWorkbookData(workbook);
         return excelConnector.writeTmpFileAndShow(workbookData);
