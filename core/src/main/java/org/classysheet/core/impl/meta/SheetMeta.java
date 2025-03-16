@@ -1,5 +1,7 @@
 package org.classysheet.core.impl.meta;
 
+import org.classysheet.core.api.domain.Column;
+import org.classysheet.core.api.domain.ColumnIgnore;
 import org.classysheet.core.api.domain.IdColumn;
 import org.classysheet.core.api.domain.Sheet;
 
@@ -37,15 +39,23 @@ public class SheetMeta {
 
         Field[] fields = sheetClass.getDeclaredFields();
         this.columnMetas = new ArrayList<>(fields.length);
-        Class<?>[] parameterTypes = new Class[fields.length];
+        List<Class<?>> parameterTypes = new ArrayList<>(fields.length);
         int index = 0;
         for (Field field : fields) {
+            if (field.isAnnotationPresent(ColumnIgnore.class)) {
+                if (field.isAnnotationPresent(Column.class)) {
+                    throw new IllegalArgumentException("The sheet class (" + sheetClass.getName()
+                            + ") has a field (" + field + ") annotated with @" + ColumnIgnore.class.getName()
+                            +  " and @" + Column.class.getName() + ".");
+                }
+                continue;
+            }
             columnMetas.add(new ColumnMeta(this, index, field));
-            parameterTypes[index] = field.getType();
+            parameterTypes.add(field.getType());
             index++;
         }
         try {
-            sheetClassConstructor = sheetClass.getDeclaredConstructor(parameterTypes);
+            sheetClassConstructor = sheetClass.getDeclaredConstructor(parameterTypes.toArray(Class[]::new));
         } catch (NoSuchMethodException e) {
             sheetClassConstructor = null;
         }

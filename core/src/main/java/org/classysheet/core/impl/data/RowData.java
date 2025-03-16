@@ -6,6 +6,8 @@ import org.classysheet.core.impl.meta.SheetMeta;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class RowData {
@@ -74,6 +76,14 @@ public class RowData {
 
     public LocalDateTime readLocalDateTime(ColumnMeta columnMeta) {
         return (LocalDateTime) readObject(columnMeta);
+    }
+
+    public String readLocalTime(ColumnMeta columnMeta) {
+        return ((LocalTime) readObject(columnMeta)).format(DateTimeFormatter.ISO_TIME);
+    }
+
+    public String readEnum(ColumnMeta columnMeta) {
+        return ((Enum<?>) readObject(columnMeta)).name();
     }
 
     public String readReference(ColumnMeta columnMeta) {

@@ -42,18 +42,16 @@ public class WorkbookMeta {
         this.name = name;
         Field[] fields = workbookClass.getDeclaredFields();
         this.sheetMetas = new ArrayList<>(fields.length);
-        Class<?>[] parameterTypes = new Class[fields.length];
-        int index = 0;
+        List<Class<?>> parameterTypes = new ArrayList<>(fields.length);
         for (Field field : fields) {
             processField(field);
-            parameterTypes[index] = field.getType();
-            index++;
+            parameterTypes.add(field.getType());
         }
         for (SheetMeta sheetMeta : sheetMetas) {
             sheetMeta.linkPotentialReferenceSheetMetas(sheetMetas);
         }
         try {
-            workbookClassConstructor = workbookClass.getDeclaredConstructor(parameterTypes);
+            workbookClassConstructor = workbookClass.getDeclaredConstructor(parameterTypes.toArray(Class[]::new));
         } catch (NoSuchMethodException e) {
             workbookClassConstructor = null;
         }

@@ -79,12 +79,6 @@ function readExcel() {
       showError("Read Excel failed.", xhr);
     }
   });
-  // $.post("/classysheet/read-excel", function (data) {
-  //   fetchDemoData();
-  // }).fail(function (xhr, ajaxOptions, thrownError) {
-  //     showError("Read Excel failed.", xhr);
-  //   },
-  //   "text");
 }
 
 

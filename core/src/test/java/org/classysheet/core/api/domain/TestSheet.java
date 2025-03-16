@@ -10,5 +10,6 @@ public record TestSheet(
         int intValue,
         LocalDate dateValue,
         LocalTime timeValue,
-        LocalDateTime dateTimeValue
+        LocalDateTime dateTimeValue,
+        TestEnum enumValue
 ) {}

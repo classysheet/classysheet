@@ -27,6 +27,7 @@ public class ClassysheetResource {
     @POST
     @Path("write-excel")
     public void writeExcel() {
+        // TODO FIXME use writeExcelOutputstream() (client and server aren't the same machine)
         classysheetService.writeExcelTmpFileAndShow(schedule);
     }
 

@@ -8,6 +8,7 @@ import org.classysheet.core.impl.provider.google.GoogleSpreadsheetConnector;
 
 import java.io.File;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 public class ClassysheetService<Workbook_> {
 
@@ -55,6 +56,11 @@ public class ClassysheetService<Workbook_> {
     public Workbook_ readExcelInputStream(InputStream inputStream) {
         WorkbookData workbookData = excelConnector.readInputStream(workbookMeta, inputStream);
         return (Workbook_) workbookData.workbook();
+    }
+
+    public void writeExcelOutputStream(Workbook_ workbook, OutputStream outputStream) {
+        WorkbookData workbookData = extractWorkbookData(workbook);
+        excelConnector.writeExcelOutputStream(workbookData, outputStream);
     }
 
     public File writeExcelTmpFileAndShow(Workbook_ workbook) {

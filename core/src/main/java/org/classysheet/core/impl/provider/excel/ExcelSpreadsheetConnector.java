@@ -12,10 +12,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.classysheet.core.impl.meta.WorkbookMeta;
 
 import java.awt.Desktop;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -109,6 +108,26 @@ public class ExcelSpreadsheetConnector {
                                     + ") is not the expected cell type (" + CellType.NUMERIC + ").");
                         }
                         value = cell.getLocalDateTimeCellValue();
+                    } else if (columnMeta.isTypeLocalTime()) {
+                        if (cell.getCellType() != CellType.STRING) {
+                            throw newIllegalFormatException(cell, "The actual cell type (" + cell.getCellType() + ")"
+                                    + ") is not the expected cell type (" + CellType.STRING + ").");
+                        }
+                        try {
+                            value = DateTimeFormatter.ISO_TIME.parse(cell.getStringCellValue());
+                        } catch (DateTimeParseException e) {
+                            throw newIllegalFormatException(cell, "The ceel value (" + cell.getStringCellValue()
+                                    + ") is not a valid time.", e);
+                        }
+                    } else if (columnMeta.isEnum()) {
+                        if (cell.getCellType() != CellType.STRING) {
+                            throw newIllegalFormatException(cell, "The actual cell type (" + cell.getCellType() + ")"
+                                    + ") is not the expected cell type (" + CellType.STRING + ").");
+                        }
+                        String stringValue = cell.getStringCellValue();
+                        // TODO extract to non-excel specific code
+                        value = stringValue == null ? null
+                                : Enum.valueOf((Class<? extends Enum>)columnMeta.type(), stringValue);
                     } else if (columnMeta.isReference()) {
                         if (cell.getCellType() != CellType.STRING) {
                             throw newIllegalFormatException(cell, "The actual cell type (" + cell.getCellType() + ")"
@@ -134,8 +153,16 @@ public class ExcelSpreadsheetConnector {
     }
 
     protected IllegalArgumentException newIllegalFormatException(Sheet sheet, int columnIndex, int rowIndex, String message) {
+        return newIllegalFormatException(sheet, columnIndex, rowIndex, message, null);
+    }
+
+    protected IllegalArgumentException newIllegalFormatException(Cell cell, String message, Exception e) {
+        return newIllegalFormatException(cell.getSheet(), cell.getColumnIndex(), cell.getRowIndex(), message, e);
+    }
+
+    protected IllegalArgumentException newIllegalFormatException(Sheet sheet, int columnIndex, int rowIndex, String message, Exception e) {
         return new IllegalArgumentException("Sheet (" + sheet.getSheetName()
-                + "), cell (" + getCellAddress(columnIndex, rowIndex) + "): " + message);
+                + "), cell (" + getCellAddress(columnIndex, rowIndex) + "): " + message, e);
     }
 
     protected String getCellAddress(int columnIndex, int rowIndex) {
@@ -147,8 +174,7 @@ public class ExcelSpreadsheetConnector {
         return columnLetter.toString() + (rowIndex + 1);
     }
 
-    public File writeTmpFileAndShow(WorkbookData workbookData) {
-        File file;
+    public void writeExcelOutputStream(WorkbookData workbookData, OutputStream outputStream) {
         try (Workbook workbook = new XSSFWorkbook()) {
             CreationHelper creationHelper = workbook.getCreationHelper();
             Font headerFont = workbook.createFont();
@@ -164,9 +190,12 @@ public class ExcelSpreadsheetConnector {
             dateCellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("yyyy-MM-dd"));
             CellStyle dateTimeCellStyle = workbook.createCellStyle();
             dateTimeCellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("yyyy-MM-dd HH:mm:ss"));
+            CellStyle timeCellStyle = workbook.createCellStyle();
+            timeCellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("HH:mm:ss"));
+            CellStyle enumCellStyle = workbook.createCellStyle(); // TODO enum style per enum type
             Font referenceFont = workbook.createFont();
-            referenceFont.setItalic(true);
             CellStyle referenceCellStyle = workbook.createCellStyle();
+            referenceFont.setItalic(true);
             referenceCellStyle.setFont(referenceFont);
 
             for (SheetData sheetData : workbookData.sheetDatas()) {
@@ -188,10 +217,15 @@ public class ExcelSpreadsheetConnector {
                         columnCellStyle = dateCellStyle;
                     } else if (columnMeta.isTypeLocalDateTime()) {
                         columnCellStyle = dateTimeCellStyle;
+                    } else if (columnMeta.isTypeLocalTime()) {
+                        columnCellStyle = timeCellStyle;
+                    } else if (columnMeta.isEnum()) {
+                        columnCellStyle = enumCellStyle;
                     } else if (columnMeta.isReference()) {
                         columnCellStyle = referenceCellStyle;
                     } else {
-                        columnCellStyle = null;
+                        throw new IllegalArgumentException(columnMeta.buildWriteContext()
+                                + "The type (" + columnMeta.type() + ") is not supported.");
                     }
                     sheet.setDefaultColumnStyle(columnMeta.index(), columnCellStyle);
                 }
@@ -211,6 +245,10 @@ public class ExcelSpreadsheetConnector {
                             cell.setCellValue(rowData.readLocalDate(columnMeta));
                         } else if (columnMeta.isTypeLocalDateTime()) {
                             cell.setCellValue(rowData.readLocalDateTime(columnMeta));
+                        } else if (columnMeta.isTypeLocalTime()) {
+                            cell.setCellValue(rowData.readLocalTime(columnMeta));
+                        } else if (columnMeta.isEnum()) {
+                            cell.setCellValue(rowData.readEnum(columnMeta));
                         } else if (columnMeta.isReference()) {
                             cell.setCellValue(rowData.readReference(columnMeta));
                         } else {
@@ -223,20 +261,22 @@ public class ExcelSpreadsheetConnector {
                 }
                 sheet.createFreezePane(0, 1);
             }
-
-            file = File.createTempFile(workbookData.workbookMeta().name(), ".xlsx");
-            workbook.write(new FileOutputStream(file));
+            workbook.write(outputStream);
         } catch (IOException e) {
             throw new RuntimeException("Failed to write Excel file for workbook name (" +
                     workbookData.workbookMeta().name() + ").", e);
         }
+    }
 
+    public File writeTmpFileAndShow(WorkbookData workbookData) {
         try {
+            File file = File.createTempFile(workbookData.workbookMeta().name(), ".xlsx");
+            writeExcelOutputStream(workbookData, new FileOutputStream(file));
             Desktop.getDesktop().open(file);
+            return file;
         } catch (IOException e) {
-            throw new RuntimeException("Failed to open the Excel file (" + file + ").", e);
+            throw new RuntimeException("Failed to create or open the Excel temp file.", e);
         }
-        return file;
     }
 
 }

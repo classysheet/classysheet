@@ -21,7 +21,6 @@
 
         <version.compiler.plugin>3.13.0</version.compiler.plugin>
         <version.surefire.plugin>3.5.2</version.surefire.plugin>
-        <version.assembly.plugin>3.7.1</version.assembly.plugin>
     </properties>
 
     <modules>
@@ -110,6 +109,17 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>${version.compiler.plugin}</version>
+            </plugin>
+            <plugin>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
