@@ -1,5 +1,8 @@
 package org.classysheet.core.impl.meta;
 
+import org.classysheet.core.api.domain.Column;
+import org.classysheet.core.api.domain.ColumnIgnore;
+import org.classysheet.core.api.domain.SheetIgnore;
 import org.classysheet.core.api.domain.Workbook;
 import org.classysheet.core.api.domain.naming.NamingStrategy;
 import org.classysheet.core.impl.data.SheetData;
@@ -44,6 +47,9 @@ public class WorkbookMeta {
         this.sheetMetas = new ArrayList<>(fields.length);
         List<Class<?>> parameterTypes = new ArrayList<>(fields.length);
         for (Field field : fields) {
+            if (field.isAnnotationPresent(SheetIgnore.class)) {
+                continue;
+            }
             processField(field);
             parameterTypes.add(field.getType());
         }
@@ -69,11 +75,11 @@ public class WorkbookMeta {
                 }
             }
         }
-        if (sheetClass != null) {
-            sheetMetas.add(new SheetMeta(this, field, sheetClass));
-        } else {
-            LOG.trace("Ignoring field ({}) because it is not a List<T>.", field);
+        if (sheetClass == null) {
+            throw new IllegalArgumentException("The workbook field (" + field + ") is not a supported type ("
+                    + List.class.getName() + ") with the generic types specified.");
         }
+        sheetMetas.add(new SheetMeta(this, field, sheetClass));
     }
 
     // ************************************************************************

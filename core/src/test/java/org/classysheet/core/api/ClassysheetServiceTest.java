@@ -1,9 +1,6 @@
 package org.classysheet.core.api;
 
-import org.classysheet.core.api.domain.TestEnum;
-import org.classysheet.core.api.domain.TestSheet;
-import org.classysheet.core.api.domain.TestSheetAlt;
-import org.classysheet.core.api.domain.TestWorkbook;
+import org.classysheet.core.api.domain.*;
 import org.classysheet.core.impl.data.WorkbookData;
 import org.junit.jupiter.api.Test;
 
@@ -55,7 +52,7 @@ class ClassysheetServiceTest {
             new TestSheetAlt("Ghent"),
             new TestSheetAlt("London")
     );
-    final TestWorkbook WORKBOOK = new TestWorkbook(TEST_SHEETS, TEST_SHEET_ALTS);
+    final TestWorkbook WORKBOOK = new TestWorkbook(TEST_SHEETS, TEST_SHEET_ALTS, "Ignored status");
 
     @Test
     void extractWorkbookData() {
@@ -69,19 +66,24 @@ class ClassysheetServiceTest {
     void excel() throws IOException {
         ClassysheetService<TestWorkbook> classysheetService = ClassysheetService.create(TestWorkbook.class);
 
+        TestWorkbook workbook1 = WORKBOOK;
+        TestWorkbook workbook2;
+
+        // TODO extract these methods to easily test workbook variations in isolation
         Path testDir = Paths.get("target/test");
         Files.createDirectories(testDir);
         Path tempFile = Files.createTempFile(testDir, "test-", ".xls");
-
-        classysheetService.writeExcelOutputStream(WORKBOOK, Files.newOutputStream(tempFile));
-        TestWorkbook workbook2 = classysheetService.readExcelInputStream(Files.newInputStream(tempFile));
+        classysheetService.writeExcelOutputStream(workbook1, Files.newOutputStream(tempFile));
+        workbook2 = classysheetService.readExcelInputStream(Files.newInputStream(tempFile));
+        Files.deleteIfExists(tempFile);
 
         assertThat(workbook2).isNotNull();
-        assertThat(workbook2.testSheets()).containsExactly(WORKBOOK.testSheets().toArray(TestSheet[]::new));
-        assertThat(workbook2.testSheetAlts()).containsExactly(WORKBOOK.testSheetAlts().toArray(TestSheetAlt[]::new));
-
-        Files.deleteIfExists(tempFile);
+        assertThat(workbook2.testSheets()).containsExactly(workbook1.testSheets().toArray(TestSheet[]::new));
+        assertThat(workbook2.testSheetAlts()).containsExactly(workbook1.testSheetAlts().toArray(TestSheetAlt[]::new));
     }
 
+
+    // TODO test workbook with non-list fields that are not ignored
+    // TODO test sheet with non supported fields that are not ignored
 
 }
