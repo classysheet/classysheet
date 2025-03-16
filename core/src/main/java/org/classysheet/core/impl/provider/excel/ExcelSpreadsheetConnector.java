@@ -13,6 +13,7 @@ import org.classysheet.core.impl.meta.WorkbookMeta;
 
 import java.awt.Desktop;
 import java.io.*;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -89,7 +90,11 @@ public class ExcelSpreadsheetConnector {
                             throw newIllegalFormatException(cell, "The actual cell type (" + cell.getCellType() + ")"
                                     + ") is not the expected cell type (" + CellType.NUMERIC + ").");
                         }
-                        value = (long) cell.getNumericCellValue();
+                        if (columnMeta.type() == Integer.class || columnMeta.type() == int.class) {
+                            value = (int) cell.getNumericCellValue();
+                        } else {
+                            value = (long) cell.getNumericCellValue();
+                        }
                     } else if (columnMeta.isTypeDouble()) {
                         if (cell.getCellType() != CellType.NUMERIC) {
                             throw newIllegalFormatException(cell, "The actual cell type (" + cell.getCellType() + ")"
@@ -114,7 +119,7 @@ public class ExcelSpreadsheetConnector {
                                     + ") is not the expected cell type (" + CellType.STRING + ").");
                         }
                         try {
-                            value = DateTimeFormatter.ISO_TIME.parse(cell.getStringCellValue());
+                            value = LocalTime.parse(cell.getStringCellValue(), DateTimeFormatter.ISO_TIME);
                         } catch (DateTimeParseException e) {
                             throw newIllegalFormatException(cell, "The ceel value (" + cell.getStringCellValue()
                                     + ") is not a valid time.", e);
