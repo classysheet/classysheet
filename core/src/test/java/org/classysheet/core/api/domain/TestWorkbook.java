@@ -4,12 +4,12 @@ import java.util.List;
 
 @Workbook
 public record TestWorkbook(
-        List<TestSheet> testSheets,
-        List<TestSheetAlt> testSheetAlts,
+        List<TestRow> rows,
+        List<TestSimpleRow> simpleRows,
         @SheetIgnore String status) {
 
-    public TestWorkbook(List<TestSheet> testSheets, List<TestSheetAlt> testSheetAlts) {
-        this(testSheets, testSheetAlts, null);
+    public TestWorkbook(List<TestRow> rows, List<TestSimpleRow> simpleRows) {
+        this(rows, simpleRows, null);
     }
 
 }

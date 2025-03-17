@@ -23,6 +23,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class ExcelSpreadsheetConnector {
 
+    // ************************************************************************
+    // Read
+    // ************************************************************************
+
     public WorkbookData readInputStream(WorkbookMeta workbookMeta, InputStream inputStream) {
         try (Workbook workbook = new XSSFWorkbook(inputStream)) {
             return readWorkbook(workbookMeta, workbook);
@@ -39,7 +43,7 @@ public class ExcelSpreadsheetConnector {
         }
     }
 
-    public WorkbookData readWorkbook(WorkbookMeta workbookMeta, Workbook workbook) {
+    protected WorkbookData readWorkbook(WorkbookMeta workbookMeta, Workbook workbook) {
         List<SheetData> sheetDatas = new ArrayList<>(workbookMeta.sheetMetas().size());
         for (SheetMeta sheetMeta : workbookMeta.sheetMetas()) {
             Sheet sheet = workbook.getSheet(sheetMeta.name());
@@ -74,6 +78,7 @@ public class ExcelSpreadsheetConnector {
                     continue;
                 }
                 List<Object> values = new ArrayList<>(sheetMeta.columnMetas().size());
+                boolean emptyRow = true;
                 for (ColumnMeta columnMeta : sheetMeta.columnMetas()) {
                     Cell cell = row.getCell(columnMeta.index());
                     Object value;
@@ -143,9 +148,14 @@ public class ExcelSpreadsheetConnector {
                     } else {
                         throw newIllegalFormatException(cell, "Unsupported type.");
                     }
+                    if (value != null) {
+                        emptyRow = false;
+                    }
                     values.add(value);
                 }
-                rows.add(sheetMeta.createRowObject(values));
+                if (!emptyRow) {
+                    rows.add(sheetMeta.createRowObject(values));
+                }
             }
             SheetData sheetData = SheetData.ofRowDatas(sheetMeta, rows);
             sheetDatas.add(sheetData);
@@ -179,97 +189,105 @@ public class ExcelSpreadsheetConnector {
         return columnLetter.toString() + (rowIndex + 1);
     }
 
+    // ************************************************************************
+    // Write
+    // ************************************************************************
+
     public void writeExcelOutputStream(WorkbookData workbookData, OutputStream outputStream) {
         try (Workbook workbook = new XSSFWorkbook()) {
-            CreationHelper creationHelper = workbook.getCreationHelper();
-            Font headerFont = workbook.createFont();
-            headerFont.setBold(true);
-            CellStyle headerCellStyle = workbook.createCellStyle();
-            headerCellStyle.setFont(headerFont);
-            CellStyle stringCellStyle = workbook.createCellStyle();
-            CellStyle longCellStyle = workbook.createCellStyle();
-            longCellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("0"));
-            CellStyle doubleCellStyle = workbook.createCellStyle();
-            doubleCellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("0.00"));
-            CellStyle dateCellStyle = workbook.createCellStyle();
-            dateCellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("yyyy-MM-dd"));
-            CellStyle dateTimeCellStyle = workbook.createCellStyle();
-            dateTimeCellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("yyyy-MM-dd HH:mm:ss"));
-            CellStyle timeCellStyle = workbook.createCellStyle();
-            timeCellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("HH:mm:ss"));
-            CellStyle enumCellStyle = workbook.createCellStyle(); // TODO enum style per enum type
-            Font referenceFont = workbook.createFont();
-            CellStyle referenceCellStyle = workbook.createCellStyle();
-            referenceFont.setItalic(true);
-            referenceCellStyle.setFont(referenceFont);
-
-            for (SheetData sheetData : workbookData.sheetDatas()) {
-                SheetMeta sheetMeta = sheetData.sheetMeta();
-                Sheet sheet = workbook.createSheet(sheetMeta.name());
-                Row headerRow = sheet.createRow(0);
-                for (ColumnMeta columnMeta : sheetMeta.columnMetas()) {
-                    Cell cell = headerRow.createCell(columnMeta.index());
-                    cell.setCellStyle(headerCellStyle);
-                    cell.setCellValue(columnMeta.name());
-                    CellStyle columnCellStyle;
-                    if (columnMeta.isTypeString()) {
-                        columnCellStyle = stringCellStyle;
-                    } else if (columnMeta.isTypeLong()) {
-                        columnCellStyle = longCellStyle;
-                    } else if (columnMeta.isTypeDouble()) {
-                        columnCellStyle = doubleCellStyle;
-                    } else if (columnMeta.isTypeLocalDate()) {
-                        columnCellStyle = dateCellStyle;
-                    } else if (columnMeta.isTypeLocalDateTime()) {
-                        columnCellStyle = dateTimeCellStyle;
-                    } else if (columnMeta.isTypeLocalTime()) {
-                        columnCellStyle = timeCellStyle;
-                    } else if (columnMeta.isEnum()) {
-                        columnCellStyle = enumCellStyle;
-                    } else if (columnMeta.isReference()) {
-                        columnCellStyle = referenceCellStyle;
-                    } else {
-                        throw new IllegalArgumentException(columnMeta.buildWriteContext()
-                                + "The type (" + columnMeta.type() + ") is not supported.");
-                    }
-                    sheet.setDefaultColumnStyle(columnMeta.index(), columnCellStyle);
-                }
-
-                AtomicInteger rowIndex = new AtomicInteger(1);
-                sheetData.streamRowDatas().forEach(rowData -> {
-                    Row row = sheet.createRow(rowIndex.getAndIncrement());
-                    for (ColumnMeta columnMeta : sheetMeta.columnMetas()) {
-                        Cell cell = row.createCell(columnMeta.index());
-                        if (columnMeta.isTypeString()) {
-                            cell.setCellValue(rowData.readString(columnMeta));
-                        } else if (columnMeta.isTypeLong()) {
-                            cell.setCellValue(rowData.readLong(columnMeta));
-                        } else if (columnMeta.isTypeDouble()) {
-                            cell.setCellValue(rowData.readDouble(columnMeta));
-                        } else if (columnMeta.isTypeLocalDate()) {
-                            cell.setCellValue(rowData.readLocalDate(columnMeta));
-                        } else if (columnMeta.isTypeLocalDateTime()) {
-                            cell.setCellValue(rowData.readLocalDateTime(columnMeta));
-                        } else if (columnMeta.isTypeLocalTime()) {
-                            cell.setCellValue(rowData.readLocalTime(columnMeta));
-                        } else if (columnMeta.isEnum()) {
-                            cell.setCellValue(rowData.readEnum(columnMeta));
-                        } else if (columnMeta.isReference()) {
-                            cell.setCellValue(rowData.readReference(columnMeta));
-                        } else {
-                            cell.setCellValue("<unsupported>");
-                        }
-                    }
-                });
-                for (ColumnMeta columnMeta : sheetMeta.columnMetas()) {
-                    sheet.autoSizeColumn(columnMeta.index());
-                }
-                sheet.createFreezePane(0, 1);
-            }
+            writeWorkbook(workbookData, workbook);
             workbook.write(outputStream);
         } catch (IOException e) {
             throw new RuntimeException("Failed to write Excel file for workbook name (" +
                     workbookData.workbookMeta().name() + ").", e);
+        }
+    }
+
+    protected void writeWorkbook(WorkbookData workbookData, Workbook workbook) {
+        CreationHelper creationHelper = workbook.getCreationHelper();
+        Font headerFont = workbook.createFont();
+        headerFont.setBold(true);
+        CellStyle headerCellStyle = workbook.createCellStyle();
+        headerCellStyle.setFont(headerFont);
+        CellStyle stringCellStyle = workbook.createCellStyle();
+        CellStyle longCellStyle = workbook.createCellStyle();
+        longCellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("0"));
+        CellStyle doubleCellStyle = workbook.createCellStyle();
+        doubleCellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("0.00"));
+        CellStyle dateCellStyle = workbook.createCellStyle();
+        dateCellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("yyyy-MM-dd"));
+        CellStyle dateTimeCellStyle = workbook.createCellStyle();
+        dateTimeCellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("yyyy-MM-dd HH:mm:ss"));
+        CellStyle timeCellStyle = workbook.createCellStyle();
+        timeCellStyle.setDataFormat(creationHelper.createDataFormat().getFormat("HH:mm:ss"));
+        CellStyle enumCellStyle = workbook.createCellStyle(); // TODO enum style per enum type
+        Font referenceFont = workbook.createFont();
+        CellStyle referenceCellStyle = workbook.createCellStyle();
+        referenceFont.setItalic(true);
+        referenceCellStyle.setFont(referenceFont);
+
+        for (SheetData sheetData : workbookData.sheetDatas()) {
+            SheetMeta sheetMeta = sheetData.sheetMeta();
+            Sheet sheet = workbook.createSheet(sheetMeta.name());
+            Row headerRow = sheet.createRow(0);
+            for (ColumnMeta columnMeta : sheetMeta.columnMetas()) {
+                Cell cell = headerRow.createCell(columnMeta.index());
+                cell.setCellStyle(headerCellStyle);
+                cell.setCellValue(columnMeta.name());
+                CellStyle columnCellStyle;
+                if (columnMeta.isTypeString()) {
+                    columnCellStyle = stringCellStyle;
+                } else if (columnMeta.isTypeLong()) {
+                    columnCellStyle = longCellStyle;
+                } else if (columnMeta.isTypeDouble()) {
+                    columnCellStyle = doubleCellStyle;
+                } else if (columnMeta.isTypeLocalDate()) {
+                    columnCellStyle = dateCellStyle;
+                } else if (columnMeta.isTypeLocalDateTime()) {
+                    columnCellStyle = dateTimeCellStyle;
+                } else if (columnMeta.isTypeLocalTime()) {
+                    columnCellStyle = timeCellStyle;
+                } else if (columnMeta.isEnum()) {
+                    columnCellStyle = enumCellStyle;
+                } else if (columnMeta.isReference()) {
+                    columnCellStyle = referenceCellStyle;
+                } else {
+                    throw new IllegalArgumentException(columnMeta.buildWriteContext()
+                            + "The type (" + columnMeta.type() + ") is not supported.");
+                }
+                sheet.setDefaultColumnStyle(columnMeta.index(), columnCellStyle);
+            }
+
+            AtomicInteger rowIndex = new AtomicInteger(1);
+            sheetData.streamRowDatas().forEach(rowData -> {
+                Row row = sheet.createRow(rowIndex.getAndIncrement());
+                for (ColumnMeta columnMeta : sheetMeta.columnMetas()) {
+                    Cell cell = row.createCell(columnMeta.index());
+                    if (columnMeta.isTypeString()) {
+                        cell.setCellValue(rowData.readString(columnMeta));
+                    } else if (columnMeta.isTypeLong()) {
+                        cell.setCellValue(rowData.readLong(columnMeta));
+                    } else if (columnMeta.isTypeDouble()) {
+                        cell.setCellValue(rowData.readDouble(columnMeta));
+                    } else if (columnMeta.isTypeLocalDate()) {
+                        cell.setCellValue(rowData.readLocalDate(columnMeta));
+                    } else if (columnMeta.isTypeLocalDateTime()) {
+                        cell.setCellValue(rowData.readLocalDateTime(columnMeta));
+                    } else if (columnMeta.isTypeLocalTime()) {
+                        cell.setCellValue(rowData.readLocalTime(columnMeta));
+                    } else if (columnMeta.isEnum()) {
+                        cell.setCellValue(rowData.readEnum(columnMeta));
+                    } else if (columnMeta.isReference()) {
+                        cell.setCellValue(rowData.readReference(columnMeta));
+                    } else {
+                        cell.setCellValue("<unsupported>");
+                    }
+                }
+            });
+            for (ColumnMeta columnMeta : sheetMeta.columnMetas()) {
+                sheet.autoSizeColumn(columnMeta.index());
+            }
+            sheet.createFreezePane(0, 1);
         }
     }
 

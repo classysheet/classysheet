@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @Sheet
-public record TestSheet(
+public record TestRow(
         String stringValue,
         int intValue,
         LocalDate dateValue,

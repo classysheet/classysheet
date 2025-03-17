@@ -2,7 +2,6 @@ package org.classysheet.examples.quarkus.rest;
 
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
 import org.jboss.resteasy.plugins.providers.multipart.MultipartFormDataInput;
 import org.jboss.resteasy.plugins.providers.multipart.InputPart;
 import org.classysheet.core.api.ClassysheetService;
