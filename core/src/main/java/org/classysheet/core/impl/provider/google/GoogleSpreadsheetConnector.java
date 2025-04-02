@@ -2,6 +2,7 @@ package org.classysheet.core.impl.provider.google;
 
 import org.classysheet.core.impl.provider.SpreadsheetConnector;
 import org.classysheet.core.impl.data.SheetData;
+import org.classysheet.core.impl.meta.SheetMeta;
 import org.classysheet.core.impl.data.WorkbookData;
 import org.classysheet.core.impl.meta.ColumnMeta;
 import org.classysheet.core.impl.data.RowData;
@@ -16,7 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class GoogleSpreadsheetConnector implements SpreadsheetConnector {
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class GoogleSpreadsheetConnector {
 
     private final String spreadsheetId;
     private final Sheets sheetsService;

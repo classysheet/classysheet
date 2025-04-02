@@ -1,9 +1,13 @@
 package org.classysheet.core.impl.meta;
 
+import org.classysheet.core.api.domain.Column;
+import org.classysheet.core.api.domain.ColumnIgnore;
 import org.classysheet.core.api.domain.IdColumn;
 import org.classysheet.core.api.domain.Sheet;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +19,7 @@ public class SheetMeta {
     private final String name;
     private final List<ColumnMeta> columnMetas;
     private ColumnMeta idColumnMeta = null;
+    private Constructor<?> sheetClassConstructor;
 
     public SheetMeta(WorkbookMeta workbookMeta, Field workbookField, Class<?> sheetClass) {
         this.workbookMeta = workbookMeta;
@@ -34,9 +39,25 @@ public class SheetMeta {
 
         Field[] fields = sheetClass.getDeclaredFields();
         this.columnMetas = new ArrayList<>(fields.length);
+        List<Class<?>> parameterTypes = new ArrayList<>(fields.length);
         int index = 0;
         for (Field field : fields) {
-            columnMetas.add(new ColumnMeta(this, index++, field));
+            if (field.isAnnotationPresent(ColumnIgnore.class)) {
+                if (field.isAnnotationPresent(Column.class)) {
+                    throw new IllegalArgumentException("The sheet class (" + sheetClass.getName()
+                            + ") has a field (" + field + ") annotated with @" + ColumnIgnore.class.getName()
+                            +  " and @" + Column.class.getName() + ".");
+                }
+                continue;
+            }
+            columnMetas.add(new ColumnMeta(this, index, field));
+            parameterTypes.add(field.getType());
+            index++;
+        }
+        try {
+            sheetClassConstructor = sheetClass.getDeclaredConstructor(parameterTypes.toArray(Class[]::new));
+        } catch (NoSuchMethodException e) {
+            sheetClassConstructor = null;
         }
     }
 
@@ -51,6 +72,23 @@ public class SheetMeta {
     public void linkPotentialReferenceSheetMetas(List<SheetMeta> sheetMetas) {
         for (ColumnMeta columnMeta : columnMetas) {
             columnMeta.linkPotentialReferenceSheetMeta(sheetMetas);
+        }
+    }
+
+    // ************************************************************************
+    // At runtime
+    // ************************************************************************
+
+    public Object createRowObject(List<Object> fieldValues) {
+        if (sheetClassConstructor == null) {
+            throw new IllegalStateException("No valid constructor found for sheet class ("
+                    + sheetClass.getName() + ").");
+        }
+        try {
+            return sheetClassConstructor.newInstance(fieldValues.toArray());
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            throw new IllegalArgumentException("Impossible state: could not call constructor (" + sheetClassConstructor
+                    + ") with parameters (" + fieldValues + ")", e);
         }
     }
 
@@ -97,5 +135,6 @@ public class SheetMeta {
     public ColumnMeta idColumnMeta() {
         return idColumnMeta;
     }
+
 
 }

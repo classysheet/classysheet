@@ -1,4 +1,4 @@
-package org.classysheet.examples.domain;
+package org.classysheet.examples.quarkus.domain;
 
 import org.classysheet.core.api.domain.Sheet;
 
@@ -17,12 +17,6 @@ public class Shift {
         this.start = start;
         this.end = end;
         this.employee = employee;
-    }
-
-    @Override
-    public String toString() {
-        return "Shift[id=" + id + ", start=" + start +", end=" + end
-                + ", employee=" + (employee == null ? "null" : employee.name()) + "]";
     }
 
     // ************************************************************************

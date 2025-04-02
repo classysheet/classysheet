@@ -1,59 +1,36 @@
 package org.classysheet.core.api;
 
-import org.classysheet.core.impl.data.WorkbookData;
+import org.classysheet.core.api.domain.Workbook;
+import org.classysheet.core.impl.DefaultClassysheetService;
 import org.classysheet.core.impl.meta.WorkbookMeta;
-import org.classysheet.core.impl.provider.excel.ExcelSpreadsheetConnector;
-import org.classysheet.core.impl.provider.google.GoogleSpreadsheetConnector;
 
+import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 
-public class ClassysheetService<Workbook_> {
+public interface ClassysheetService<Workbook_> {
 
-    private final String spreadsheetId;
-    protected final WorkbookMeta workbookMeta;
-    protected final GoogleSpreadsheetConnector googleSpreadsheetConnector;
-    protected final ExcelSpreadsheetConnector excelConnector = new ExcelSpreadsheetConnector();
-
-    private ClassysheetService(WorkbookMeta workbookMeta, String spreadsheetId) {
-        this.workbookMeta = workbookMeta;
-        this.spreadsheetId = spreadsheetId;
-        this.googleSpreadsheetConnector = new GoogleSpreadsheetConnector(spreadsheetId);
-    }
-
-    private ClassysheetService(WorkbookMeta workbookMeta) {
-        this.workbookMeta = workbookMeta;
-        this.spreadsheetId = null;
-        this.googleSpreadsheetConnector = null;
-    }
-
-    public static <Workbook_> ClassysheetService<Workbook_> create(
-            Class<Workbook_> workbookClass, String spreadsheetId) {
-        return new ClassysheetService<>(new WorkbookMeta(workbookClass), spreadsheetId);
-    }
-
-    public static <Workbook_> ClassysheetService<Workbook_> create(
+    /**
+     * Create a new service from domain annotations.
+     * Typically called once at bootstrap or build time.
+     *
+     * @param workbookClass never null
+     * @param <Workbook_> The class with a {@link Workbook} annotation.
+     * @return never null
+     */
+    static <Workbook_> ClassysheetService<Workbook_> create(
             Class<Workbook_> workbookClass) {
-        return new ClassysheetService<>(new WorkbookMeta(workbookClass));
+        return new DefaultClassysheetService<>(workbookClass);
     }
 
-    protected WorkbookMeta getWorkbookMeta() {
-        return workbookMeta;
-    }
+    void writeWorkbookToGoogle(Workbook_ workbook);
 
-    protected WorkbookData extractWorkbookData(Workbook_ workbook) {
-        return new WorkbookData(workbookMeta, workbook);
-    }
+    Workbook_ readExcelFile(File file);
 
-    public void writeWorkbookToGoogle(Workbook_ workbook) {
-        if (spreadsheetId == null) {
-            throw new IllegalStateException("spreadsheetId is null. Initialize ClassysheetService with a valid spreadsheetId for Google Sheets.");
-        }
-        WorkbookData workbookData = extractWorkbookData(workbook);
-        assert googleSpreadsheetConnector != null;
-        googleSpreadsheetConnector.writeWorkbook(workbookData);
-    }
+    Workbook_ readExcelInputStream(InputStream inputStream);
 
-    public void writeWorkbookToExcel(Workbook_ workbook) {
-        WorkbookData workbookData = extractWorkbookData(workbook);
-        excelConnector.writeWorkbook(workbookData);
-    }
+    void writeExcelOutputStream(Workbook_ workbook, OutputStream outputStream);
+
+    File writeExcelTmpFileAndShow(Workbook_ workbook);
+
 }

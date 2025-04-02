@@ -6,6 +6,7 @@ import org.classysheet.core.api.domain.IdColumn;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 public class ColumnMeta {
@@ -81,8 +82,24 @@ public class ColumnMeta {
         return type.isAssignableFrom(LocalDateTime.class);
     }
 
+    public boolean isTypeLocalTime() {
+        return type.isAssignableFrom(LocalTime.class);
+    }
+
+    public boolean isEnum() {
+        return type.isEnum();
+    }
+
     public boolean isReference() {
         return referenceSheetMeta != null;
+    }
+
+    public String buildWriteContext() {
+        return "The sheet class (" + sheetMeta.sheetClass() + ") field (" + field.getName() + "): ";
+    }
+
+    public String buildReadContext() {
+        return "The sheet (" + sheetMeta.name() + ") column (" + name + "): ";
     }
 
     @Override

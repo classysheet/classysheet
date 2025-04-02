@@ -1,0 +1,36 @@
+<html lang="en">
+<head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <title>Classysheet Quarkus</title>
+  <link rel="stylesheet" href="/webjars/bootstrap/css/bootstrap.min.css"/>
+  <link rel="stylesheet" href="/webjars/font-awesome/css/all.css"/>
+</head>
+<body>
+<div class="container">
+  <div class="sticky-top d-flex justify-content-center align-items-center" aria-live="polite" aria-atomic="true">
+    <div id="notificationPanel" style="position: absolute; top: .5rem;"></div>
+  </div>
+  <h1>Classysheet Quarkus</h1>
+  <div id="demo"></div>
+
+  <p>Click on the button below to see it.</p>
+
+  <div class="mb-2">
+    <button id="writeExcelButton" type="button" class="btn btn-success">
+      <span class="fas fa-download"></span> Write Excel
+    </button>
+  </div>
+  <div class="mb-2">
+    <button id="readExcelButton" type="button" class="btn btn-success">
+      <span class="fas fa-upload"></span> Read Excel
+    </button>
+    <input type="file" id="readExcelFile">
+  </div>
+</div>
+
+<script src="/webjars/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/webjars/jquery/jquery.min.js"></script>
+<script src="/app.js"></script>
+</body>
+</html>
