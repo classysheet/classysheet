@@ -74,15 +74,13 @@ Schedule schedule = ...;
 classysheetService.writeExcelTmpFileAndShow(schedule);
 ----
 
-*Note*: reading is not yet supported.
-
 == Get started
 
 Take a look at the examples:
 
-- link:examples/hello-world-java/src/main/java/org/classysheet/examples/ExcelExample.java[Hello world Java (Excel)]
-- link:examples/hello-world-java/src/main/java/org/classysheet/examples/GoogleSheetsExample.java[Java to Google Sheets hello-world]
-- link:examples/quarkus-java/src/main/java/org/classysheet/examples/quarkus/rest/ClassysheetResource.java[Quarkus Java (Excel)]
+- link:examples/hello-world-java/src/main/java/org/classysheet/examples/ExcelExample.java[Hello world Java Excel]
+- link:examples/hello-world-java/src/main/java/org/classysheet/examples/GoogleSheetsExample.java[Hello world Java Google Sheets]
+- link:examples/quarkus-java/src/main/java/org/classysheet/examples/quarkus/rest/ClassysheetResource.java[Quarkus Java Excel]
 
 [NOTE]
 

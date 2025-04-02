@@ -1,8 +1,6 @@
 package org.classysheet.core.impl.provider.google;
 
-import org.classysheet.core.impl.provider.SpreadsheetConnector;
 import org.classysheet.core.impl.data.SheetData;
-import org.classysheet.core.impl.meta.SheetMeta;
 import org.classysheet.core.impl.data.WorkbookData;
 import org.classysheet.core.impl.meta.ColumnMeta;
 import org.classysheet.core.impl.data.RowData;
@@ -17,27 +15,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.List;
-
 public class GoogleSpreadsheetConnector {
 
-    private final String spreadsheetId;
-    private final Sheets sheetsService;
+    private volatile Sheets sheetsService;
 
-    public GoogleSpreadsheetConnector(String spreadsheetId) {
-        this.spreadsheetId = spreadsheetId;
-        try {
-            this.sheetsService = SheetsServiceUtil.getSheetsService();
-        } catch (IOException | GeneralSecurityException e) {
-            throw new RuntimeException("Failed to initialize Google Sheets service", e);
+    private synchronized void initSheetsService() {
+        if (sheetsService == null) {
+            try {
+                sheetsService = SheetsServiceUtil.getSheetsService();
+            } catch (IOException | GeneralSecurityException e) {
+                throw new RuntimeException("Failed to initialize Google Sheets service.", e);
+            }
         }
     }
 
-    @Override
-    public void writeWorkbook(WorkbookData workbookData) {
+    public void writeFile(String spreadsheetId, WorkbookData workbookData) {
+        initSheetsService();
         try {
             Spreadsheet spreadsheet = sheetsService.spreadsheets().get(spreadsheetId).execute();
             List<String> existingSheetNames = spreadsheet.getSheets().stream()
@@ -79,7 +72,7 @@ public class GoogleSpreadsheetConnector {
                 data.add(headerRange);
 
                 AtomicInteger rowIndex = new AtomicInteger(2);
-                sheetData.streamRows().forEach(rowData -> {
+                sheetData.streamRowDatas().forEach(rowData -> {
                     List<Object> rowValues = new ArrayList<>();
                     for (ColumnMeta columnMeta : sheetData.sheetMeta().columnMetas()) {
                         Object cellValue = getCellValue(rowData, columnMeta);
@@ -99,7 +92,7 @@ public class GoogleSpreadsheetConnector {
                 sheetsService.spreadsheets().values().batchUpdate(spreadsheetId, updateRequest).execute();
             }
 
-            applyFormattingAndAdjustColumns(workbookData);
+            applyFormattingAndAdjustColumns(spreadsheetId, workbookData);
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to write data to Google Sheets", e);
@@ -128,7 +121,7 @@ public class GoogleSpreadsheetConnector {
         }
     }
 
-    private void applyFormattingAndAdjustColumns(WorkbookData workbookData) throws IOException {
+    private void applyFormattingAndAdjustColumns(String spreadsheetId, WorkbookData workbookData) throws IOException {
         List<Request> requests = new ArrayList<>();
 
         for (SheetData sheetData : workbookData.sheetDatas()) {

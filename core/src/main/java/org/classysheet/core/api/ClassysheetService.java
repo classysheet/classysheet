@@ -2,7 +2,6 @@ package org.classysheet.core.api;
 
 import org.classysheet.core.api.domain.Workbook;
 import org.classysheet.core.impl.DefaultClassysheetService;
-import org.classysheet.core.impl.meta.WorkbookMeta;
 
 import java.io.File;
 import java.io.InputStream;
@@ -23,7 +22,19 @@ public interface ClassysheetService<Workbook_> {
         return new DefaultClassysheetService<>(workbookClass);
     }
 
-    void writeWorkbookToGoogle(Workbook_ workbook);
+    // ************************************************************************
+    // Google Sheets
+    // ************************************************************************
+
+    Workbook_ readGoogleSheetsFile(String spreadsheetId);
+
+    String writeGoogleSheetsFile(Workbook_ workbook);
+
+    void overwriteGoogleSheetsFile(String spreadsheetId, Workbook_ workbook);
+
+    // ************************************************************************
+    // Excel
+    // ************************************************************************
 
     Workbook_ readExcelFile(File file);
 

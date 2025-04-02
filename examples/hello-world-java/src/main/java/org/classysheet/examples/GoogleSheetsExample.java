@@ -8,6 +8,9 @@ import com.google.api.services.sheets.v4.Sheets;
 import com.google.api.services.sheets.v4.model.Spreadsheet;
 import com.google.api.services.sheets.v4.model.SpreadsheetProperties;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+
 public class GoogleSheetsExample {
     public static void main(String[] args) {
         try {
@@ -21,16 +24,16 @@ public class GoogleSheetsExample {
                 throw new RuntimeException("Error creating workbook on google sheets");
             }
 
-            ClassysheetService<Schedule> classysheetService = ClassysheetService.<Schedule>create(Schedule.class, spreadsheetId);
+            ClassysheetService<Schedule> classysheetService = ClassysheetService.<Schedule>create(Schedule.class);
 
             Schedule schedule = ScheduleGenerator.generateDemoData();
 
-            classysheetService.writeWorkbookToGoogle(schedule);
+            classysheetService.overwriteGoogleSheetsFile(spreadsheetId, schedule);
 
             System.out.println("data successfully written on" + spreadsheetId);
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (IOException | GeneralSecurityException e) {
+            throw new IllegalStateException("ERROR", e); // TODO clean me up
         }
     }
 }

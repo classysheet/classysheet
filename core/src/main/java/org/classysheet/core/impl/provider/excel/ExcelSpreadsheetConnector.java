@@ -1,7 +1,6 @@
 package org.classysheet.core.impl.provider.excel;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.classysheet.core.impl.data.RowData;
 import org.classysheet.core.impl.data.SheetData;
 import org.classysheet.core.impl.data.WorkbookData;
 import org.classysheet.core.impl.meta.ColumnMeta;
@@ -193,7 +192,7 @@ public class ExcelSpreadsheetConnector {
     // Write
     // ************************************************************************
 
-    public void writeExcelOutputStream(WorkbookData workbookData, OutputStream outputStream) {
+    public void writeOutputStream(WorkbookData workbookData, OutputStream outputStream) {
         try (Workbook workbook = new XSSFWorkbook()) {
             writeWorkbook(workbookData, workbook);
             workbook.write(outputStream);
@@ -294,7 +293,7 @@ public class ExcelSpreadsheetConnector {
     public File writeTmpFileAndShow(WorkbookData workbookData) {
         try {
             File file = File.createTempFile(workbookData.workbookMeta().name(), ".xlsx");
-            writeExcelOutputStream(workbookData, new FileOutputStream(file));
+            writeOutputStream(workbookData, new FileOutputStream(file));
             Desktop.getDesktop().open(file);
             return file;
         } catch (IOException e) {

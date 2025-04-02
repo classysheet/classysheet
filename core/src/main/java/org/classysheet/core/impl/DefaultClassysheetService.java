@@ -24,11 +24,29 @@ public class DefaultClassysheetService<Workbook_>implements ClassysheetService<W
         return new WorkbookData(workbookMeta, workbook);
     }
 
+    // ************************************************************************
+    // Google Sheets
+    // ************************************************************************
+
     @Override
-    public void writeWorkbookToGoogle(Workbook_ workbook) {
-        WorkbookData workbookData = extractWorkbookData(workbook);
-        googleSpreadsheetConnector.writeWorkbook(workbookData);
+    public Workbook_ readGoogleSheetsFile(String spreadsheetId) {
+        throw new UnsupportedOperationException("Not implemented yet");
     }
+
+    @Override
+    public String writeGoogleSheetsFile(Workbook_ workbook) {
+        throw new UnsupportedOperationException("Not implemented yet");
+    }
+
+    @Override
+    public void overwriteGoogleSheetsFile(String spreadsheetId, Workbook_ workbook) {
+        WorkbookData workbookData = extractWorkbookData(workbook);
+        googleSpreadsheetConnector.writeFile(spreadsheetId, workbookData);
+    }
+
+    // ************************************************************************
+    // Excel
+    // ************************************************************************
 
     @Override
     @SuppressWarnings("unchecked")
@@ -47,7 +65,7 @@ public class DefaultClassysheetService<Workbook_>implements ClassysheetService<W
     @Override
     public void writeExcelOutputStream(Workbook_ workbook, OutputStream outputStream) {
         WorkbookData workbookData = extractWorkbookData(workbook);
-        excelConnector.writeExcelOutputStream(workbookData, outputStream);
+        excelConnector.writeOutputStream(workbookData, outputStream);
     }
 
     @Override
