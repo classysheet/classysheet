@@ -1,6 +1,7 @@
 package org.classysheet.core.impl.provider.excel;
 
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.util.CellRangeAddressList;
 import org.classysheet.core.impl.data.SheetData;
 import org.classysheet.core.impl.data.WorkbookData;
 import org.classysheet.core.impl.meta.ColumnMeta;
@@ -227,6 +228,7 @@ public class ExcelSpreadsheetConnector {
         for (SheetData sheetData : workbookData.sheetDatas()) {
             SheetMeta sheetMeta = sheetData.sheetMeta();
             Sheet sheet = workbook.createSheet(sheetMeta.name());
+            DataValidationHelper validationHelper = sheet.getDataValidationHelper();
             Row headerRow = sheet.createRow(0);
             for (ColumnMeta columnMeta : sheetMeta.columnMetas()) {
                 Cell cell = headerRow.createCell(columnMeta.index());
@@ -247,6 +249,15 @@ public class ExcelSpreadsheetConnector {
                     columnCellStyle = timeCellStyle;
                 } else if (columnMeta.isEnum()) {
                     columnCellStyle = enumCellStyle;
+                    // TODO drop down doesn't show up yet
+                    DataValidationConstraint constraint = validationHelper.createExplicitListConstraint(columnMeta.enumMeta().getNames());
+                    CellRangeAddressList addressList = new CellRangeAddressList(1, Integer.MAX_VALUE, columnMeta.index(), columnMeta.index());
+                    DataValidation validation = validationHelper.createValidation(constraint, addressList);
+                    validation.setSuppressDropDownArrow(false);
+                    validation.setShowErrorBox(true);
+                    validation.setErrorStyle(DataValidation.ErrorStyle.STOP);
+                    validation.createErrorBox("Invalid value", "Please select a value from the dropdown list.");
+                    sheet.addValidationData(validation);
                 } else if (columnMeta.isReference()) {
                     columnCellStyle = referenceCellStyle;
                 } else {
