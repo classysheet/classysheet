@@ -1,6 +1,7 @@
 package org.classysheet.core.api.domain.naming;
 
 import org.classysheet.core.api.domain.Column;
+import org.classysheet.core.api.domain.CellValue;
 import org.classysheet.core.api.domain.Sheet;
 import org.classysheet.core.api.domain.Workbook;
 
@@ -31,5 +32,13 @@ public interface NamingStrategy {
      * @return never null
      */
     String columnName(Field columnField);
+
+    /**
+     * Only used if {@link CellValue#name()} is null.
+     *
+     * @param enumValue never null
+     * @return never null
+     */
+    String enumName(Enum<?> enumValue);
 
 }

@@ -2,6 +2,7 @@ package org.classysheet.core.impl.meta;
 
 import org.classysheet.core.api.domain.Column;
 import org.classysheet.core.api.domain.IdColumn;
+import org.classysheet.core.api.domain.naming.NamingStrategy;
 
 import java.lang.reflect.Field;
 import java.time.LocalDate;
@@ -16,21 +17,28 @@ public class ColumnMeta {
     private final String name;
     private final Field field;
     private final Class<?> type;
+    private final EnumMeta enumMeta;
     private final boolean isIdColumn;
     private SheetMeta referenceSheetMeta = null;
 
-    public ColumnMeta(SheetMeta sheetMeta, int index, Field field) {
+    public ColumnMeta(SheetMeta sheetMeta, int index, Field field, MetaBuilderContext builderContext) {
         this.sheetMeta = sheetMeta;
         this.index = index;
         this.field = field;
+        NamingStrategy namingStrategy = sheetMeta.workbookMeta().namingStrategy();
         Column columnAnnotation = field.getAnnotation(Column.class);
         String name = (columnAnnotation == null) ? "" : columnAnnotation.name();
         if (name.isEmpty()) {
-            name = sheetMeta.workbookMeta().namingStrategy().columnName(field);
+            name = namingStrategy.columnName(field);
         }
         this.name = name;
         this.type = field.getType();
         field.setAccessible(true);
+        if (type.isEnum()) {
+            enumMeta = builderContext.getEnumMeta((Class<? extends Enum<?>>) type, namingStrategy);
+        } else {
+            enumMeta = null;
+        }
         IdColumn idColumnAnnotation = field.getAnnotation(IdColumn.class);
         isIdColumn = (idColumnAnnotation != null);
         if (isIdColumn) {
@@ -90,6 +98,13 @@ public class ColumnMeta {
         return type.isEnum();
     }
 
+    public Object parseEnum(String stringValue) {
+        if (stringValue == null) {
+            return null;
+        }
+        return enumMeta.convertToEnum(stringValue);
+    }
+
     public boolean isReference() {
         return referenceSheetMeta != null;
     }
@@ -125,6 +140,10 @@ public class ColumnMeta {
 
     public Class<?> type() {
         return type;
+    }
+
+    public EnumMeta enumMeta() {
+        return enumMeta;
     }
 
     public boolean isIdColumn() {

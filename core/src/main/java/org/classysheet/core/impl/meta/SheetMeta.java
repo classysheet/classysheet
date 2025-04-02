@@ -21,7 +21,7 @@ public class SheetMeta {
     private ColumnMeta idColumnMeta = null;
     private Constructor<?> sheetClassConstructor;
 
-    public SheetMeta(WorkbookMeta workbookMeta, Field workbookField, Class<?> sheetClass) {
+    public SheetMeta(WorkbookMeta workbookMeta, Field workbookField, Class<?> sheetClass, MetaBuilderContext builderContext) {
         this.workbookMeta = workbookMeta;
         this.workbookField = workbookField;
         workbookField.setAccessible(true);
@@ -50,7 +50,7 @@ public class SheetMeta {
                 }
                 continue;
             }
-            columnMetas.add(new ColumnMeta(this, index, field));
+            columnMetas.add(new ColumnMeta(this, index, field, builderContext));
             parameterTypes.add(field.getType());
             index++;
         }

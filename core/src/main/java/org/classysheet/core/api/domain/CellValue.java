@@ -4,16 +4,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
 import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Target({ FIELD })
 @Retention(RUNTIME)
-public @interface Column {
+public @interface CellValue {
 
     /**
-     * Defaults to the field name without camel case and with a starting capital.
-     * For example "fooBar" becomes "Foo bar".
+     * Defaults to the enum value name in lower case, with underscores as spaces, and with a starting capital.
+     * For example "FOO_BAR" becomes "Foo bar".
      * @return "" if it should use the default name.
      */
     String name() default "";

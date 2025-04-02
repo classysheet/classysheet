@@ -83,7 +83,11 @@ public class RowData {
     }
 
     public String readEnum(ColumnMeta columnMeta) {
-        return ((Enum<?>) readObject(columnMeta)).name();
+        Enum<?> enumValue = (Enum<?>) readObject(columnMeta);
+        if (enumValue == null) {
+            return "";
+        }
+        return columnMeta.enumMeta().convertToString(enumValue);
     }
 
     public String readReference(ColumnMeta columnMeta) {

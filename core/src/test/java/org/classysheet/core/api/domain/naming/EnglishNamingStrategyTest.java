@@ -9,6 +9,7 @@ class EnglishNamingStrategyTest {
     record House(String name, String lastName) {}
     record BlueHouse() {}
     record Puppy() {}
+    enum DogRace{GOLDEN_RETRIEVER, GERMAN_SHEPHERD, POODLE}
 
     @Test
     void workbookName() {
@@ -31,6 +32,14 @@ class EnglishNamingStrategyTest {
         NamingStrategy namingStrategy = new EnglishNamingStrategy();
         assertThat(namingStrategy.columnName(House.class.getDeclaredField("name"))).isEqualTo("Name");
         assertThat(namingStrategy.columnName(House.class.getDeclaredField("lastName"))).isEqualTo("Last name");
+    }
+
+    @Test
+    void enumName() {
+        NamingStrategy namingStrategy = new EnglishNamingStrategy();
+        assertThat(namingStrategy.enumName(DogRace.GOLDEN_RETRIEVER)).isEqualTo("Golden retriever");
+        assertThat(namingStrategy.enumName(DogRace.GERMAN_SHEPHERD)).isEqualTo("German shepherd");
+        assertThat(namingStrategy.enumName(DogRace.POODLE)).isEqualTo("Poodle");
     }
 
 }

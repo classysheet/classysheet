@@ -1,6 +1,7 @@
 package org.classysheet.examples.data;
 
 import org.classysheet.examples.domain.Employee;
+import org.classysheet.examples.domain.Gender;
 import org.classysheet.examples.domain.Schedule;
 import org.classysheet.examples.domain.Shift;
 
@@ -12,9 +13,9 @@ import java.util.List;
 public class ScheduleGenerator {
 
     public static Schedule generateDemoData() {
-        Employee ann = new Employee("Ann", 30, 123.45);
-        Employee beth = new Employee("Beth", 50, 345.67);
-        Employee carl = new Employee("Carl", 40, 234.56);
+        Employee ann = new Employee("Ann", Gender.FEMALE, 30, 123.45);
+        Employee beth = new Employee("Beth", Gender.FEMALE, 50, 345.67);
+        Employee carl = new Employee("Carl", Gender.MALE, 40, 234.56);
         List<Employee> employees = List.of(ann, beth, carl);
         LocalDate today = LocalDate.now();
         LocalDate tomorrow = today.plusDays(1);

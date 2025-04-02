@@ -26,6 +26,7 @@ public class WorkbookMeta {
 
     public <Workbook_> WorkbookMeta(Class<Workbook_> workbookClass) {
         this.workbookClass = workbookClass;
+        MetaBuilderContext builderContext = new MetaBuilderContext();
         Workbook workbookAnnotation = workbookClass.getAnnotation(Workbook.class);
         if (workbookAnnotation == null) {
             throw new IllegalArgumentException("The workbook class (" + workbookClass.getName()
@@ -50,7 +51,7 @@ public class WorkbookMeta {
             if (field.isAnnotationPresent(SheetIgnore.class)) {
                 continue;
             }
-            processField(field);
+            processField(field, builderContext);
             parameterTypes.add(field.getType());
         }
         for (SheetMeta sheetMeta : sheetMetas) {
@@ -63,7 +64,7 @@ public class WorkbookMeta {
         }
     }
 
-    private void processField(Field field) {
+    private void processField(Field field, MetaBuilderContext builderContext) {
         Class<?> sheetClass = null;
         if (List.class.isAssignableFrom(field.getType())) {
             Type genericType = field.getGenericType();
@@ -79,7 +80,7 @@ public class WorkbookMeta {
             throw new IllegalArgumentException("The workbook field (" + field + ") is not a supported type ("
                     + List.class.getName() + ") with the generic types specified.");
         }
-        sheetMetas.add(new SheetMeta(this, field, sheetClass));
+        sheetMetas.add(new SheetMeta(this, field, sheetClass, builderContext));
     }
 
     // ************************************************************************

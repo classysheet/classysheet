@@ -31,6 +31,7 @@ If another sheet uses it, add an `@IdColumn` annotation on a field:
 @Sheet
 public record Employee(
     @IdColumn String name,
+    Gender gender,
     long age,
     double cost) {}
 ----

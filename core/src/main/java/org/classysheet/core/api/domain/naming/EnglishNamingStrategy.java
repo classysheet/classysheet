@@ -24,6 +24,13 @@ public class EnglishNamingStrategy implements NamingStrategy {
         return decamelCase(name);
     }
 
+    @Override
+    public String enumName(Enum<?> enumValue) {
+        String name = enumValue.name();
+        String withSpaces =  name.replaceAll("_", " ");
+        return withSpaces.substring(0, 1).toUpperCase() + withSpaces.substring(1).toLowerCase();
+    }
+
     private static String decamelCase(String name) {
         String withSpaces = name.replaceAll("(?<=[a-z])(?=[A-Z])", " ");
         return withSpaces.substring(0, 1).toUpperCase() + withSpaces.substring(1).toLowerCase();

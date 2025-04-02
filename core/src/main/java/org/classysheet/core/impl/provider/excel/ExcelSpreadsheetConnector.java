@@ -134,9 +134,8 @@ public class ExcelSpreadsheetConnector {
                                     + ") is not the expected cell type (" + CellType.STRING + ").");
                         }
                         String stringValue = cell.getStringCellValue();
-                        // TODO extract to non-excel specific code
-                        value = stringValue == null ? null
-                                : Enum.valueOf((Class<? extends Enum>)columnMeta.type(), stringValue);
+                        // TODO Deal with invalid stringValue properly, giving the cell number
+                        value = columnMeta.parseEnum(stringValue);
                     } else if (columnMeta.isReference()) {
                         if (cell.getCellType() != CellType.STRING) {
                             throw newIllegalFormatException(cell, "The actual cell type (" + cell.getCellType() + ")"
